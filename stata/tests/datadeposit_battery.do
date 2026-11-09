@@ -174,6 +174,71 @@ check "_rc != 0" "apply drops"
 datadeposit apply using "cb2/codebook/auto_codebook.xlsx"
 check "c(k) == 11" "apply reads the codebook xlsx"
 
+* --- 9. pressure cases ---------------------------------------------------------------------
+* data shipped with Stata: the default deposit goes to the working folder, not Stata's own
+sysuse auto, clear
+datadeposit
+check `"strpos(r(path), c(sysdir_base)) == 0"' "default deposit of sysuse data stays out of Stata's folders"
+capture confirm file "auto_deposit/MANIFEST.json"
+check "_rc == 0" "default deposit of sysuse data is in the working folder"
+* decimal comma setting must not reach the csv
+set dp comma
+gen double third = _n / 3
+datadeposit, to(dpcomma) replace
+set dp period
+check `"r(verified) == "passed""' "set dp comma does not change the files"
+* empty data, never saved
+clear
+gen long id = .
+gen str5 s = ""
+datadeposit, to(zero) replace
+check `"r(verified) == "passed""' "zero observations"
+* Unicode name, all-missing variable, labelled extended missing only, long text
+clear
+set obs 5
+gen año = _n
+gen allmiss = .
+gen strL longtext = 3000 * "é"
+gen byte b = .a
+label define bl .a "Not asked"
+label values b bl
+datadeposit, to(uni) replace
+check `"r(verified) == "passed""' "Unicode variable name, all-missing variable, 6,000-byte text"
+* variable names that look like setup.do's own temporary names
+clear
+set obs 3
+gen __dd_2 = 1
+gen __dd_1 = 2
+gen __000001 = 3
+datadeposit, to(tmpnames) replace
+check `"r(verified) == "passed""' "variables named like temporary names"
+* a wide survey file stays fast (1,500 variables with item text)
+clear
+set obs 100
+forvalues j = 1/1500 {
+    gen byte q`j' = mod(_n + `j', 5) + 1
+    char q`j'[question] "Full text of survey question number `j'."
+}
+label define five 1 "Never" 2 "Rarely" 3 "Sometimes" 4 "Often" 5 "Always"
+label values q* five
+timer clear 9
+timer on 9
+datadeposit, to(wide) replace
+timer off 9
+quietly timer list 9
+check `"r(verified) == "passed""' "1,500-variable file round trip"
+check "r(t9) < 120" "1,500-variable file finishes in under two minutes"
+* targets that cannot be used
+sysuse auto, clear
+capture datadeposit, to("sv/README.md") replace
+check "_rc == 602" "a file as the target is refused"
+* text and Excel sources read by content
+datadeposit, to(xl) formats(csv xlsx) replace
+capture datadeposit, files("xl/data/auto.xlsx") to(fromxl) replace
+check "_rc == 0" "an Excel file deposits"
+capture datadeposit, files("sv/codebook/survey_edge_codebook.md") to(frommd) replace
+check "_rc == 610" "a Markdown file is refused as data"
+
 cd "`here'"
 di as txt "{hline}"
 di as txt "BATTERY PASSED: $DD_N checks on Stata `c(stata_version)'"

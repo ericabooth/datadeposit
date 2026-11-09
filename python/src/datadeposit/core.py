@@ -166,6 +166,14 @@ def spit(path, text):
         fh.write(text)
 
 
+def group(rows, key):
+    """Rows of a table grouped by one column, keeping order (keeps the writers linear in time)."""
+    out = {}
+    for r in rows:
+        out.setdefault(r[key], []).append(r)
+    return out
+
+
 def meta_path(root, ds, tab):
     return os.path.join(root, "metadata", "%s_%s.csv" % (ds, tab))
 
@@ -359,15 +367,16 @@ def write_data_csv(path, t, chunk=100000):
 # codebook markdown, DDI, datapackage, README, MANIFEST
 # ----------------------------------------------------------------------------
 
-def _md_chars(v, chars, qchar):
-    notes = sorted(((int(r["char"][4:]), r["text"]) for r in chars
-                    if r["variable"] == v and NOTE.match(r["char"]) and r["char"] != "note0"))
+def _md_chars(rows, qchar):
+    """Notes and other characteristics of one variable (rows = that variable's chars rows)."""
+    notes = sorted(((int(r["char"][4:]), r["text"]) for r in rows
+                    if NOTE.match(r["char"]) and r["char"] != "note0"))
     out = ""
     if notes:
         out = "**Notes:**\n\n" + "".join("%d. %s\n" % (j, mdcell(t)) for j, (_, t) in enumerate(notes, 1)) + "\n"
     other = ""
-    for r in chars:
-        if r["variable"] != v or NOTE.match(r["char"]) or r["char"] == qchar:
+    for r in rows:
+        if NOTE.match(r["char"]) or r["char"] == qchar:
             continue
         if not other:
             other = "**Characteristics:**\n\n"
@@ -386,6 +395,10 @@ def write_codebook_md(root, ds):
     F = table_dicts(meta_path(root, ds, "frequencies")) if os.path.exists(meta_path(root, ds, "frequencies")) else None
     dd = dict((k, v) for k, v in D)
     dlab, qchar = dd.get("label", ""), dd.get("question_char", "")
+    Cg, Lg = group(C, "variable"), group(L, "set")
+    Sg = group(S, "variable") if S is not None else {}
+    Fg = group(F, "variable") if F is not None else {}
+    parts = []
     out = "# Codebook: %s\n\n" % ds
     if dlab:
         out += dlab + "\n\n"
@@ -395,27 +408,26 @@ def write_codebook_md(root, ds):
             continue
         out += "| %s | %s |\n" % (k, mdcell(v))
     out += "\n"
-    t = _md_chars("_dta", C, "")
+    t = _md_chars(Cg.get("_dta", []), "")
     if t:
         out += "## Dataset notes and characteristics\n\n" + t
     out += "## Variables\n\n| # | Name | Label | Type | Value labels |\n|---|---|---|---|---|\n"
     for k, v in enumerate(V, 1):
         out += "| %d | %s | %s | %s | %s |\n" % (k, v["stata_name"], mdcell(v["label"]), v["stata_type"], v["value_labels"])
     out += "\n"
+    parts.append(out)
     for v in V:
         nm = v["stata_name"]
-        out += "### %s\n\n" % nm
+        out = "### %s\n\n" % nm
         if v["label"]:
             out += "**Label:** %s\n\n" % mdcell(v["label"])
         if qchar:
-            for r in C:
-                if r["variable"] == nm and r["char"] == qchar:
+            for r in Cg.get(nm, []):
+                if r["char"] == qchar:
                     out += "**Question text:**\n\n" + mdquote(r["text"]) + "\n\n"
         out += "**Type:** %s (%s), format %s\n\n" % (v["stata_type"], v["kind"], v["format"])
         if S is not None:
-            for s in S:
-                if s["variable"] != nm:
-                    continue
+            for s in Sg.get(nm, []):
                 t = "**Values:** %s valid, %s%s" % (s["n_valid"], s["n_missing"],
                                                     " empty" if v["kind"] == "string" else " missing")
                 if s["n_extended"] != "0":
@@ -431,17 +443,16 @@ def write_codebook_md(root, ds):
             out += "**Value labels** (%s):\n\n" % v["value_labels"]
             if F is not None:
                 out += "| Value | Label | Count |\n|---|---|---|\n"
-                for f in F:
-                    if f["variable"] == nm:
-                        out += "| %s | %s | %s |\n" % (f["value"], mdcell(f["label"]), f["count"])
+                for f in Fg.get(nm, []):
+                    out += "| %s | %s | %s |\n" % (f["value"], mdcell(f["label"]), f["count"])
             else:
                 out += "| Value | Label |\n|---|---|\n"
-                for r in L:
-                    if r["set"] == v["value_labels"]:
-                        out += "| %s | %s |\n" % (r["value"], mdcell(r["label"]))
+                for r in Lg.get(v["value_labels"], []):
+                    out += "| %s | %s |\n" % (r["value"], mdcell(r["label"]))
             out += "\n"
-        out += _md_chars(nm, C, qchar)
-    spit(os.path.join(root, "codebook", ds + "_codebook.md"), out)
+        out += _md_chars(Cg.get(nm, []), qchar)
+        parts.append(out)
+    spit(os.path.join(root, "codebook", ds + "_codebook.md"), "".join(parts))
 
 
 def _ddistat(typ, v):
@@ -456,6 +467,10 @@ def write_ddi(root, ds):
     S = table_dicts(meta_path(root, ds, "summary")) if os.path.exists(meta_path(root, ds, "summary")) else None
     F = table_dicts(meta_path(root, ds, "frequencies")) if os.path.exists(meta_path(root, ds, "frequencies")) else None
     qchar, dlab = dd.get("question_char", ""), dd.get("label", "")
+    Cg, Lg = group(C, "variable"), group(L, "set")
+    Sg = group(S, "variable") if S is not None else {}
+    Fg = group(F, "variable") if F is not None else {}
+    parts = []
     out = '<?xml version="1.0" encoding="UTF-8"?>\n<codeBook xmlns="ddi:codebook:2_5" version="2.5">\n'
     out += "  <stdyDscr>\n    <citation>\n      <titlStmt>\n        <titl>%s</titl>\n" % xml(dlab or ds)
     out += "      </titlStmt>\n    </citation>\n  </stdyDscr>\n"
@@ -463,30 +478,28 @@ def write_ddi(root, ds):
     out += "      <dimensns>\n        <caseQnty>%s</caseQnty>\n        <varQnty>%s</varQnty>\n      </dimensns>\n" % (
         dd.get("n_obs", ""), dd.get("n_vars", ""))
     out += "      <fileType>text/csv</fileType>\n    </fileTxt>\n  </fileDscr>\n  <dataDscr>\n"
+    parts.append(out)
     for k, v in enumerate(V, 1):
         nm = v["stata_name"]
         t = '    <var ID="V%d" name="%s" files="F1"' % (k, xml(nm))
         if v["kind"] == "numeric":
             t += ' intrvl="%s"' % ("discrete" if v["value_labels"] else "contin")
-        out += t + ">\n"
+        out = t + ">\n"
         if v["label"]:
             out += "      <labl>%s</labl>\n" % xml(v["label"])
         if qchar:
-            for r in C:
-                if r["variable"] == nm and r["char"] == qchar:
+            for r in Cg.get(nm, []):
+                if r["char"] == qchar:
                     out += "      <qstn>\n        <qstnLit>%s</qstnLit>\n      </qstn>\n" % xml(r["text"])
         if S is not None:
-            for s in S:
-                if s["variable"] != nm:
-                    continue
+            for s in Sg.get(nm, []):
                 out += _ddistat("vald", s["n_valid"])
                 out += _ddistat("invd", str(int(s["n_missing"]) + int(s["n_extended"])))
                 if v["kind"] == "numeric":
                     for a, b in (("min", "min"), ("max", "max"), ("mean", "mean"), ("stdev", "sd")):
                         out += _ddistat(a, s[b])
         if v["value_labels"]:
-            src = [f for f in F if f["variable"] == nm] if F is not None else \
-                [{"value": r["value"], "label": r["label"]} for r in L if r["set"] == v["value_labels"]]
+            src = Fg.get(nm, []) if F is not None else Lg.get(v["value_labels"], [])
             for f in src:
                 out += "      <catgry%s>\n" % (' missing="Y"' if f["value"].startswith(".") else "")
                 out += "        <catValu>%s</catValu>\n" % xml(f["value"])
@@ -497,12 +510,13 @@ def write_ddi(root, ds):
                 out += "      </catgry>\n"
         out += '      <varFormat type="%s" schema="other" formatname="%s"/>\n' % (
             "character" if v["kind"] == "string" else "numeric", xml(v["format"]))
-        for r in C:
-            if r["variable"] == nm and NOTE.match(r["char"]) and r["char"] != "note0":
+        for r in Cg.get(nm, []):
+            if NOTE.match(r["char"]) and r["char"] != "note0":
                 out += "      <notes>%s</notes>\n" % xml(r["text"])
         out += "    </var>\n"
-    out += "  </dataDscr>\n</codeBook>\n"
-    spit(os.path.join(root, "codebook", ds + "_ddi.xml"), out)
+        parts.append(out)
+    parts.append("  </dataDscr>\n</codeBook>\n")
+    spit(os.path.join(root, "codebook", ds + "_ddi.xml"), "".join(parts))
 
 
 def _clean(s):
@@ -534,6 +548,7 @@ def write_datapackage(root, stems, info):
         C = table_dicts(meta_path(root, ds, "chars"))
         dd = dict(read_csv(meta_path(root, ds, "dataset"))[1:])
         qchar, dlab = dd.get("question_char", ""), dd.get("label", "")
+        Cg, Lg = group(C, "variable"), group(L, "set")
         out += "    {\n"
         out += '      "name": %s,\n      "path": %s,\n' % (js(ds.lower()), js("data/%s.csv" % ds))
         if dlab:
@@ -552,18 +567,18 @@ def write_datapackage(root, stems, info):
             if v["label"]:
                 out += '            "title": %s,\n' % js(v["label"])
             if qchar:
-                for r in C:
-                    if r["variable"] == v["stata_name"] and r["char"] == qchar:
+                for r in Cg.get(v["stata_name"], []):
+                    if r["char"] == qchar:
                         out += '            "description": %s,\n' % js(r["text"])
             if v["value_labels"]:
-                cats = ['{"value": %s, "label": %s}' % (r["value"], js(r["label"])) for r in L
-                        if r["set"] == v["value_labels"] and not r["value"].startswith(".")]
+                cats = ['{"value": %s, "label": %s}' % (r["value"], js(r["label"]))
+                        for r in Lg.get(v["value_labels"], []) if not r["value"].startswith(".")]
                 if cats:
                     out += '            "categories": [%s],\n' % ", ".join(cats)
             miss = ['{"value": "", "label": "missing"}']
             if v["value_labels"]:
-                miss += ['{"value": %s, "label": %s}' % (js(r["value"]), js(r["label"])) for r in L
-                         if r["set"] == v["value_labels"] and r["value"].startswith(".")]
+                miss += ['{"value": %s, "label": %s}' % (js(r["value"]), js(r["label"]))
+                         for r in Lg.get(v["value_labels"], []) if r["value"].startswith(".")]
             out += '            "missingValues": [%s],\n' % ", ".join(miss)
             out += '            "stata": {"name": %s, "type": %s, "format": %s, "valueLabels": %s}\n' % (
                 js(v["stata_name"]), js(v["stata_type"]), js(v["format"]), js(v["value_labels"]))

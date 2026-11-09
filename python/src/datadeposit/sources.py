@@ -124,6 +124,31 @@ def _to_text(s):
                      for v in s], dtype=object)
 
 
+def nan_tags(values):
+    """Extended missing codes held inside NaNs: 0 for none, 1 (.a) to 26 (.z), or None when there are none."""
+    a = np.ascontiguousarray(values, dtype=np.float64)
+    bits = a.view(np.uint64)
+    low = (bits & np.uint64(0xFF)).astype(np.int64)
+    clean = (bits & np.uint64(0x0007FFFFFFFFFF00)) == 0
+    k = np.where(np.isnan(a) & clean & (low >= 1) & (low <= 26), low, 0).astype(np.int8)
+    return k if k.any() else None
+
+
+def missing_codes(series):
+    """The extended missing code of each value: '' for none, '.a' to '.z' otherwise.
+
+    Works on numeric columns of a DataFrame loaded with deposit_use() or a
+    deposit's setup.py, after any filtering, sorting, or merging.
+    """
+    if not pd.api.types.is_float_dtype(series):
+        return pd.Series("", index=series.index, name=series.name)
+    k = nan_tags(series.to_numpy(dtype=np.float64, copy=False) if str(series.dtype) == "float64"
+                 else np.full(len(series), 0.0))
+    if k is None:
+        return pd.Series("", index=series.index, name=series.name)
+    return pd.Series(["." + chr(96 + int(v)) if v else "" for v in k], index=series.index, name=series.name)
+
+
 STATA_MAX = 8.988465674311579e307
 MISSING_TOKENS = {"", "NA", "N/A", "NaN", "nan", "null", "NULL", "."}
 
@@ -185,13 +210,16 @@ def _clean_frame(df, notes):
 def from_dataframe(df, name="data", meta=None, source_file=""):
     notes = []
     attrs = dict(df.attrs)
+    # work on a view without attrs: pandas deep-copies attrs on every column
+    # access, which is slow when they hold the metadata of a wide file
+    df = df.copy(deep=False)
+    df.attrs = {}
     df = _clean_frame(df, notes)
-    df.attrs.update(attrs)
-    dd = df.attrs.get("datadeposit") if isinstance(df.attrs.get("datadeposit"), dict) else None
+    dd = attrs.get("datadeposit") if isinstance(attrs.get("datadeposit"), dict) else None
     if dd is not None and "variables" in dd:
         t = _from_deposit_frame(df, name, dd, source_file)
     else:
-        t = _from_plain_frame(df, name, meta, source_file)
+        t = _from_plain_frame(df, name, meta, source_file, attrs)
     t.notes = notes + t.notes
     return t
 
@@ -228,6 +256,11 @@ def _from_deposit_frame(df, name, dd, source_file):
         sets[s] = [(k, v) for k, v in mapping.items()]
     extm = dd.get("extended_missing", {})
     pos = {lab: i for i, lab in enumerate(df.index)}
+    notes = []
+    try:
+        n_loaded = int(dd.get("dataset_table", {}).get("n_obs", -1))
+    except (TypeError, ValueError):
+        n_loaded = -1
     newcols = [c for c in df.columns if c not in variables]
     new_sn = dict(zip(newcols, stata_names(newcols)))
     cols = []
@@ -251,14 +284,25 @@ def _from_deposit_frame(df, name, dd, source_file):
             if isinstance(s.dtype, pd.CategoricalDtype):
                 inv = {lab: k for k, lab in dd["variable_value_labels"].get(c, {}).items()}
                 s = s.astype(object).map(lambda x: inv.get(x, x))
+            ext = nan_tags(s.to_numpy()) if str(s.dtype) == "float64" else None
             x = _numeric_from_series(s, kind)
-            ext = np.zeros(len(x), dtype=np.int8)
-            for letter, idx in extm.get(c, {}).items():
-                for lab in idx:
-                    if lab in pos:
-                        ext[pos[lab]] = ord(letter) - 96
-            if not ext.any():
-                ext = None
+            if kind != "numeric" and c in extm:
+                # dates cannot hold a code inside the value, so the positions
+                # recorded at load time are used, but only while they still fit
+                ext = np.zeros(len(x), dtype=np.int8)
+                ok = len(df) == n_loaded
+                for letter, idx in extm[c].items():
+                    for lab in idx:
+                        if lab in pos and np.isnan(x[pos[lab]]):
+                            ext[pos[lab]] = ord(letter) - 96
+                        else:
+                            ok = False
+                if not ok:
+                    ext = None
+                    notes.append("%s: rows changed since loading, so its extended missing codes "
+                                 "(.a to .z) could not be placed and are plain missing" % c)
+                elif not ext.any():
+                    ext = None
             vals = x
             if kind == "numeric" and typ in ("byte", "int", "long"):
                 it = _int_type(x)
@@ -270,11 +314,13 @@ def _from_deposit_frame(df, name, dd, source_file):
         cols.append(Column(c, v["stata_name"], typ, v["format"], v["label"], v["value_labels"], vals, ext,
                            by_var.get(v["stata_name"], [])))
     ds = dd.get("dataset_table", {})
-    return Table(name, cols, len(df), dd.get("file_label", ""), sets, dta_chars,
-                 [x for x in dd.get("sortedby", "").split() if x in {k.stata_name for k in cols}],
-                 source_file or ds.get("source_file", ""),
-                 question_char=ds.get("question_char") or None,
-                 provenance=dd.get("provenance", ""))
+    t = Table(name, cols, len(df), dd.get("file_label", ""), sets, dta_chars,
+              [x for x in dd.get("sortedby", "").split() if x in {k.stata_name for k in cols}],
+              source_file or ds.get("source_file", ""),
+              question_char=ds.get("question_char") or None,
+              provenance=dd.get("provenance", ""))
+    t.notes = notes
+    return t
 
 
 def _infer_column(s, name, stata_name, label, labels):
@@ -297,23 +343,25 @@ def _infer_column(s, name, stata_name, label, labels):
         x = _numeric_from_series(s, "date")
         return Column(name, stata_name, "long", "%td", label or "", "", x), {}
     if pd.api.types.is_numeric_dtype(s):
+        ext = nan_tags(s.to_numpy()) if str(s.dtype) == "float64" else None
         x = pd.to_numeric(s, errors="coerce").to_numpy(dtype=np.float64, na_value=np.nan)
         if str(s.dtype) in ("float32", "Float32"):
             typ = "float"
         else:
             typ = _int_type(x) or "double"
         vl = stata_name if labels else ""
-        return Column(name, stata_name, typ, _default_format(typ), label or "", vl, x), {}
+        return Column(name, stata_name, typ, _default_format(typ), label or "", vl, x, ext), {}
     vals = _to_text(s)
     typ = _str_type(vals)
     return Column(name, stata_name, typ, _default_format(typ), label or "", "", vals), {}
 
 
-def _from_plain_frame(df, name, meta, source_file):
-    labels = dict(df.attrs.get("column_names_to_labels", {}))
-    vvl = dict(df.attrs.get("variable_value_labels", {}))
-    v2l = dict(df.attrs.get("variable_to_label", {}))
-    file_label = df.attrs.get("file_label", "") or ""
+def _from_plain_frame(df, name, meta, source_file, attrs=None):
+    attrs = attrs or {}
+    labels = dict(attrs.get("column_names_to_labels", {}))
+    vvl = dict(attrs.get("variable_value_labels", {}))
+    v2l = dict(attrs.get("variable_to_label", {}))
+    file_label = attrs.get("file_label", "") or ""
     if meta is not None:
         labels.update(getattr(meta, "column_names_to_labels", {}) or {})
         vvl.update(getattr(meta, "variable_value_labels", {}) or {})

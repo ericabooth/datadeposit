@@ -7,16 +7,18 @@
 {viewerjumpto "Description" "datadeposit##description"}{...}
 {viewerjumpto "Options" "datadeposit##options"}{...}
 {viewerjumpto "The deposit folder" "datadeposit##folder"}{...}
+{viewerjumpto "Files it can read" "datadeposit##files"}{...}
 {viewerjumpto "Survey data" "datadeposit##survey"}{...}
 {viewerjumpto "Large files" "datadeposit##large"}{...}
 {viewerjumpto "New versions" "datadeposit##versions"}{...}
+{viewerjumpto "Missing software" "datadeposit##missing"}{...}
 {viewerjumpto "Examples" "datadeposit##examples"}{...}
 {viewerjumpto "Stored results" "datadeposit##results"}{...}
 {viewerjumpto "Author" "datadeposit##author"}{...}
 {title:Title}
 
 {phang}
-{bf:datadeposit} {hline 2} Archive-ready data deposits that open the same way in Stata, R, Python, and Excel
+{bf:datadeposit} {hline 2} Prepare data, documentation, and code for colleagues the way you would for a data archive, from Stata, R, or Python
 {p_end}
 
 
@@ -29,7 +31,7 @@
 {cmd:datadeposit} [{varlist}] {ifin} [{cmd:,} {it:options}]
 {p_end}
 
-{pstd}Write a deposit of one or more {cmd:.dta} files{p_end}
+{pstd}Write a deposit of one or more data files, or of every data file in a folder{p_end}
 
 {p 8 16 2}
 {cmd:datadeposit} {cmd:,} {opt files(filelist)} | {opt folder(path)} [{opt pattern(pattern)} {it:options}]
@@ -55,6 +57,9 @@
 {synoptline}
 {syntab:Where and what}
 {synopt:{opt to(folder)}}deposit folder; default is {it:name}{cmd:_deposit} beside the source file{p_end}
+{synopt:{opt files(filelist)}}deposit these files in place of the data in memory{p_end}
+{synopt:{opt folder(path)}}deposit every data file in this folder{p_end}
+{synopt:{opt pattern(pattern)}}which files in {cmd:folder()} to consider; default {cmd:*.dta}{p_end}
 {synopt:{opt name(string)}}dataset name inside the deposit; default is the file name{p_end}
 {synopt:{opt formats(list)}}data files to write, from {cmd:csv dta rds xlsx sav}; default {cmd:csv dta rds}{p_end}
 {synopt:{opt lean}}write the {cmd:.dta} and the {cmd:.csv} only; the setup scripts cover R and Python{p_end}
@@ -88,25 +93,35 @@
 {title:Description}
 
 {pstd}
-{cmd:datadeposit} writes the kind of folder that data archives such as ICPSR and
-Harvard Dataverse distribute: the data as a plain-text {cmd:.csv} plus native
-copies for Stata and R, a codebook, and setup scripts that rebuild the labelled
-data from the {cmd:.csv} in Stata, R, and Python. A colleague who works in R or
-Python, or who opens files in Excel, gets the same variable labels, value labels,
-notes, and survey item text that you see in Stata.
+{cmd:datadeposit} is for teams that work in more than one statistical language.
+One analyst cleans a survey in Stata, a colleague models it in R, a partner reads
+it in Python, and a program officer opens it in Excel. Each handoff usually loses
+something: value labels, notes, the wording of the survey questions, or the
+precision of a number.
+{p_end}
+
+{pstd}
+Data archives such as ICPSR and Harvard Dataverse distribute each study as a
+folder with the data in plain text, a codebook, and setup files that rebuild the
+labelled data in each statistical package. {cmd:datadeposit} writes that kind of
+folder, which we call a deposit, so that your colleagues and partners receive
+your analysis file in the form an archive would give them. A colleague who works
+in R or Python gets the same variable labels, value labels, notes, and survey
+question text that you see in Stata, and the folder is already in the shape an
+archive expects.
 {p_end}
 
 {pstd}
 The same command exists in R ({cmd:datadeposit()}) and Python
 ({cmd:datadeposit.datadeposit()}). All three write the same folder: the metadata
 tables, setup scripts, codebook, and DDI file are identical byte for byte, and the
-data files agree value for value. The repository's parity tests check this.
+data files agree value for value. The repository's tests compare the three.
 {p_end}
 
 {pstd}
-A typical use is the last line of an analysis do-file: once the cleaned file is
-saved, {cmd:datadeposit} writes a portable copy that anyone on a mixed Stata, R,
-and Python team can open, and that you can send to an archive as it stands.
+We suggest you make {cmd:datadeposit} the last line of an analysis do-file. Once
+the cleaned file is saved, the command writes a portable copy that anyone on the
+team can open, and each rerun of the do-file refreshes it.
 {p_end}
 
 
@@ -116,7 +131,16 @@ and Python team can open, and that you can send to an archive as it stands.
 {phang}
 {opt to(folder)} names the deposit folder. Without it, the folder is
 {it:name}{cmd:_deposit} beside the source file, or {it:name}{cmd:_deposit_v}{it:#}
-for version {it:#}.
+for version {it:#}. Data that came with Stata ({cmd:sysuse}, {cmd:webuse}) are
+deposited in the working directory.
+{p_end}
+
+{phang}
+{opt files(filelist)} and {opt folder(path)} deposit files from disk and leave the
+data in memory untouched. The files can be Stata, delimited text, Excel, or SPSS
+files; see {help datadeposit##files:Files it can read}. With {cmd:folder()},
+{cmd:pattern("*")} considers every file: {cmd:datadeposit} deposits each data file
+it finds and lists each file it skipped with the reason.
 {p_end}
 
 {phang}
@@ -209,6 +233,37 @@ script. The full rules are in {cmd:spec/DEPOSIT-SPEC.md} in the GitHub repositor
 {p_end}
 
 
+{marker files}{...}
+{title:Files it can read}
+
+{pstd}
+With {cmd:files()} or {cmd:folder()}, {cmd:datadeposit} decides what a file is by
+reading its first bytes, so the file's extension does not have to be right. It
+prints a note for each thing it changed on the way in.
+{p_end}
+
+{phang2}o Delimited text with commas, tabs, pipes, or semicolons, whatever the
+extension ({cmd:.csv}, {cmd:.txt}, {cmd:.tsv}, {cmd:.dat}), including semicolon files
+with decimal commas and gzipped files.{p_end}
+{phang2}o Text in Latin-1, UTF-8 with a byte-order mark, or UTF-16, which is
+converted to UTF-8.{p_end}
+{phang2}o Stata, Excel, and SPSS files, including ones with the wrong extension.{p_end}
+{phang2}o Columns of ZIP codes or IDs that start with 0 stay text. {cmd:NA},
+{cmd:N/A}, {cmd:NaN}, {cmd:null}, and {cmd:.} in a numeric column are read as
+missing.{p_end}
+{phang2}o Repeated or invalid column names are renamed; the original name stays in
+the csv and the codebook, and in {cmd:[datadeposit_name]}.{p_end}
+
+{pstd}
+{cmd:datadeposit} refuses a file that is not a table and says why: binary data
+named {cmd:.txt}, prose notes, an empty file, or a table whose rows have different
+numbers of fields (the message names the first bad row). Code and documents
+({cmd:.do}, {cmd:.R}, {cmd:.py}, {cmd:.pdf}, {cmd:.md}) are skipped in a folder; pass
+them with {cmd:include()} to copy them into {cmd:docs/}. A {cmd:strL} variable that
+holds binary data cannot pass through a csv, so the command stops and names it.
+{p_end}
+
+
 {marker survey}{...}
 {title:Survey data}
 
@@ -225,7 +280,8 @@ quotes, dollar signs, backticks, line breaks, and Unicode, up to Stata's limit o
 characters as the label and the full text in {cmd:[datadeposit_label]}.{p_end}
 {phang2}o Shared value label sets, labelled extended missing codes such as
 {cmd:.d} "Don't know" and {cmd:.r} "Refused", and label languages
-({cmd:label language}).{p_end}
+({cmd:label language}). In R and Python the missing code is stored inside the
+missing value, so it stays with its row through filters, sorts, and merges.{p_end}
 {phang2}o {cmd:svyset}, {cmd:xtset}, and other settings that Stata stores as
 characteristics.{p_end}
 
@@ -275,6 +331,32 @@ that nobody has used, {cmd:replace} is fine.
 {p_end}
 
 
+{marker missing}{...}
+{title:Missing software}
+
+{pstd}
+{cmd:datadeposit} finishes the deposit with what the machine has and tells you how
+to add the rest.
+{p_end}
+
+{phang2}o {bf:No R on this machine.} The {cmd:.rds} copy is skipped and a note says
+so. R users can still rebuild the data with {cmd:setup/}{it:name}{cmd:_setup.R}. To
+write the {cmd:.rds}, install R from {browse "https://cloud.r-project.org"}, or point
+to it with {cmd:rscript()} or the environment variable {cmd:DATADEPOSIT_RSCRIPT}.
+{cmd:lean} stops asking for an {cmd:.rds}.{p_end}
+{phang2}o {bf:A colleague has Stata 14 or 15.} {cmd:setup.do} needs Stata 16 and
+says so; the colleague opens {cmd:data/}{it:name}{cmd:.dta} directly, which holds
+the same data and labels.{p_end}
+{phang2}o {bf:A colleague has Stata 13 or older.} The same message gives the
+steps: import {cmd:data/}{it:name}{cmd:.csv} and take labels from the
+{cmd:metadata} tables.{p_end}
+{phang2}o {bf:A colleague has no statistical software.} The csv and
+{cmd:codebook/}{it:name}{cmd:_codebook.xlsx} open in Excel.{p_end}
+{phang2}o {bf:A deposit was interrupted.} {cmd:datadeposit use} and
+{cmd:datadeposit verify} report that it did not finish; run {cmd:datadeposit}
+again with {cmd:replace}.{p_end}
+
+
 {marker examples}{...}
 {title:Examples}
 
@@ -284,6 +366,12 @@ that nobody has used, {cmd:replace} is fine.
 
 {pstd}Large data: never stop, step down to lean when needed{p_end}
 {phang2}{cmd:. datadeposit, to(claims_deposit) onlarge(lean) replace}{p_end}
+
+{pstd}Every data file in a folder, whatever its type{p_end}
+{phang2}{cmd:. datadeposit, folder("raw") pattern("*") to(raw_deposit)}{p_end}
+
+{pstd}A pipe-delimited text file{p_end}
+{phang2}{cmd:. datadeposit, files("responses.txt") to(responses_deposit)}{p_end}
 
 {pstd}Several files in one deposit, with the questionnaire{p_end}
 {phang2}{cmd:. datadeposit, files("wave1.dta wave2.dta wave3.dta") to(panel_deposit) include("questionnaire.pdf")}{p_end}
@@ -330,11 +418,10 @@ that nobody has used, {cmd:replace} is fine.
 {title:Author}
 
 {pstd}Eric A. Booth{break}
-eric.a.booth@gmail.com{break}
 {browse "https://github.com/ericabooth/datadeposit"}{p_end}
 
 {pstd}
-Requires Stata 16 or newer. No other user-written commands are needed. The
+Requires Stata 16 or newer. No other community-contributed commands are needed. The
 {cmd:.rds} and {cmd:.sav} copies need R; hashes use {cmd:shasum} or
 {cmd:sha256sum} (macOS and Linux) or {cmd:certutil} (Windows).
 {p_end}

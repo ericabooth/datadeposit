@@ -129,3 +129,52 @@ test_that("apply edited metadata", {
   expect_true("turning_circle" %in% names(new))
   expect_false("trunk" %in% names(new))
 })
+
+test_that("extended missing codes follow rows, with and without haven", {
+  out <- file.path(tempdir(), "r_tags")
+  unlink(out, recursive = TRUE)
+  dep(fixture("survey_edge.dta"), to = out)
+  for (hv in c(TRUE, FALSE)) {
+    d <- deposit_use(out, haven = hv)
+    expect_equal(sum(datadeposit:::dd_na_tag(d$q1) == "d"), 26)
+    expect_identical(sum(haven::na_tag(d$q1) == "r", na.rm = TRUE), 11L)
+    want <- c(table(datadeposit:::dd_na_tag(d$q1)[d$wave == 1]))
+    sub <- d[d$wave == 1, ]
+    sub <- sub[order(sub$income), ]
+    out2 <- file.path(tempdir(), "r_tags_sub")
+    r <- dep(sub, to = out2, replace = TRUE)
+    expect_equal(r$verified, "passed")
+    expect_identical(c(table(datadeposit:::dd_na_tag(deposit_use(out2, haven = hv)$q1))), want)
+  }
+})
+
+test_that("awkward columns are converted with a note, and bad targets are refused", {
+  d <- data.frame(x = c(1.5, Inf, NA), stringsAsFactors = FALSE)
+  d$lst <- list(1:2, "a", NULL)
+  d$span <- as.difftime(c(1, 2, 3), units = "hours")
+  d$when <- as.POSIXct("2025-01-01 12:00", tz = "America/Chicago") + 0:2
+  d$day <- as.Date("1950-05-06") + 0:2
+  out <- file.path(tempdir(), "r_awk")
+  unlink(out, recursive = TRUE)
+  m <- capture.output(r <- datadeposit(d, to = out, name = "awk"), type = "message")
+  expect_equal(r$verified, "passed")
+  expect_true(any(grepl("infinite", m)) && any(grepl("list column", m)) && any(grepl("UTC", m)))
+  f <- tempfile(fileext = ".txt")
+  writeLines("x", f)
+  expect_error(dep(d, to = f, replace = TRUE), "is a file")
+  expect_error(dep(data.frame(a = 1, a = 2, check.names = FALSE), to = file.path(tempdir(), "r_dup")), "unique")
+  expect_error(deposit_use(tempdir()), "not a datadeposit folder")
+})
+
+test_that("a wide file stays fast", {
+  k <- 1500
+  d <- as.data.frame(matrix(rep(1:5, length.out = 50 * k), nrow = 50))
+  names(d) <- paste0("q", seq_len(k))
+  for (j in seq_len(k)) attr(d[[j]], "label") <- paste("Question", j)
+  out <- file.path(tempdir(), "r_wide")
+  unlink(out, recursive = TRUE)
+  t0 <- Sys.time()
+  r <- dep(d, to = out, name = "wide", formats = c("csv", "dta"))
+  expect_equal(r$verified, "passed")
+  expect_lt(as.numeric(difftime(Sys.time(), t0, units = "secs")), 120)
+})

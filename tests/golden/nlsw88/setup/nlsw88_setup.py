@@ -9,7 +9,7 @@ From Python:
 From a shell:
     python setup/nlsw88_setup.py [--root DIR] [--save-pickle FILE] [--save-parquet FILE]
 
-Needs pandas and the standard library only. Labels and other metadata land in
+Needs pandas and the standard library only. Labels and other metadata are in
 df.attrs["datadeposit"]; the pyreadstat-style names (column_names_to_labels,
 variable_value_labels, value_labels, variable_to_label) are also set at the
 top level of df.attrs. Every label, value label, note, and characteristic
@@ -30,6 +30,27 @@ except ImportError:  # pragma: no cover - depends on the machine
 DATASET = "nlsw88"
 SPEC = "1.0"
 _TAG = re.compile(r"^\.[a-z]$")
+_TAGGED_NAN = 0x7FF8000000000000   # a quiet NaN; the low byte holds 1 (.a) to 26 (.z)
+
+
+class _Meta(dict):
+    """Metadata that pandas shares between frames instead of copying.
+
+    pandas deep-copies df.attrs on almost every operation. For a survey file
+    with thousands of variables that would make each column access slow, so
+    these dictionaries are handed on as they are. They describe the deposit,
+    not one frame, so sharing them is safe. Pickling turns them into plain
+    dictionaries.
+    """
+
+    def __deepcopy__(self, memo):
+        return self
+
+    def __copy__(self):
+        return self
+
+    def __reduce__(self):
+        return (dict, (dict(self),))
 
 
 def _here():
@@ -109,12 +130,12 @@ def load(root=None, categoricals=False):
         return [t for _, t in sorted(notes)], other
 
     qchar = dataset.get("question_char", "")
-    meta = {"dataset": DATASET, "spec": SPEC, "root": os.path.abspath(root),
-            "file_label": dataset.get("label", ""), "sortedby": dataset.get("sortedby", ""),
-            "column_labels": {}, "variable_value_labels": {}, "value_labels": sets,
-            "variable_to_label": {}, "formats": {}, "stata_types": {}, "notes": {},
-            "chars": {}, "questions": {}, "extended_missing": {}, "variables": variables,
-            "char_rows": chars, "dataset_table": dataset}
+    meta = _Meta({"dataset": DATASET, "spec": SPEC, "root": os.path.abspath(root),
+                  "file_label": dataset.get("label", ""), "sortedby": dataset.get("sortedby", ""),
+                  "column_labels": _Meta(), "variable_value_labels": _Meta(), "value_labels": _Meta(sets),
+                  "variable_to_label": _Meta(), "formats": {}, "stata_types": {}, "notes": {},
+                  "chars": {}, "questions": {}, "extended_missing": {}, "variables": variables,
+                  "char_rows": chars, "dataset_table": dataset})
 
     for v in variables:
         name, kind = v["name"], v["kind"]
@@ -141,6 +162,14 @@ def load(root=None, categoricals=False):
         if kind == "numeric" and v["stata_type"] == "float":
             # Stata floats are float32; the csv text rounds back to the same float32
             df[name] = df[name].astype("float32").astype("float64")
+        if kind == "numeric" and name in meta["extended_missing"]:
+            # keep each extended missing code (.a to .z) inside its NaN, as R's
+            # haven does, so the code follows the row through filters and sorts
+            arr = df[name].to_numpy(dtype="float64", copy=True)
+            bits = arr.view("uint64")
+            for letter, idx in meta["extended_missing"][name].items():
+                bits[idx] = _TAGGED_NAN + (ord(letter) - 96)
+            df[name] = arr
         if v["label"]:
             meta["column_labels"][name] = v["label"]
         meta["formats"][name] = v["format"]

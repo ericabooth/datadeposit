@@ -88,13 +88,9 @@ dd_to_stata_units <- function(x, kind) {
 }
 
 dd_tags <- function(x) {
-  if (requireNamespace("haven", quietly = TRUE) && is.double(x)) {
-    tg <- haven::na_tag(x)
-    k <- match(tg, letters)
-    k[is.na(k)] <- 0L
-    if (any(k > 0)) return(as.integer(k))
-  }
-  NULL
+  k <- match(dd_na_tag(x), letters)
+  k[is.na(k)] <- 0L
+  if (any(k > 0)) as.integer(k) else NULL
 }
 
 dd_infer_column <- function(x, name, stata_name) {
@@ -109,8 +105,8 @@ dd_infer_column <- function(x, name, stata_name) {
     return(list(col = dd_column(name, stata_name, typ, dd_default_format(typ), lab, stata_name, codes), sets = stats::setNames(list(set), stata_name)))
   }
   if (is.logical(x)) return(list(col = dd_column(name, stata_name, "byte", "%8.0g", lab, "", as.double(x)), sets = list()))
-  if (inherits(x, "POSIXct")) return(list(col = dd_column(name, stata_name, "double", "%tc", lab, "", dd_to_stata_units(x, "datetime")), sets = list()))
-  if (inherits(x, "Date")) return(list(col = dd_column(name, stata_name, "long", "%td", lab, "", dd_to_stata_units(x, "date")), sets = list()))
+  if (inherits(x, "POSIXct")) return(list(col = dd_column(name, stata_name, "double", "%tc", lab, "", dd_to_stata_units(x, "datetime"), dd_tags(x)), sets = list()))
+  if (inherits(x, "Date")) return(list(col = dd_column(name, stata_name, "long", "%td", lab, "", dd_to_stata_units(x, "date"), dd_tags(x)), sets = list()))
   if (is.numeric(x)) {
     ext <- dd_tags(x)
     v <- as.double(unclass(x))
@@ -120,7 +116,8 @@ dd_infer_column <- function(x, name, stata_name) {
     sets <- list()
     vl <- ""
     if (!is.null(labs) && is.numeric(labs)) {
-      tg <- if (requireNamespace("haven", quietly = TRUE)) haven::na_tag(labs) else rep(NA_character_, length(labs))
+      tg <- dd_na_tag(labs)
+      tg[!nzchar(tg)] <- NA_character_
       val <- ifelse(is.na(tg), sprintf("%.0f", unclass(labs)), paste0(".", tg))
       keep <- !is.na(tg) | (!is.na(unclass(labs)) & unclass(labs) == floor(unclass(labs)))
       sets[[stata_name]] <- data.frame(value = val[keep], label = names(labs)[keep], stringsAsFactors = FALSE)
@@ -180,8 +177,7 @@ dd_clean_frame <- function(df) {
       if (!is.null(a$label)) attr(df[[j]], "label") <- a$label
     } else if (is.double(x) && !inherits(x, "Date")) {
       bad <- is.infinite(x) | (!is.na(x) & abs(x) > DD_STATA_MAX)
-      tagged <- if (requireNamespace("haven", quietly = TRUE)) !is.na(haven::na_tag(x)) else rep(FALSE, length(x))
-      bad <- bad & !tagged
+
       if (any(bad, na.rm = TRUE)) {
         x[which(bad)] <- NA_real_
         df[[j]] <- x
@@ -253,15 +249,9 @@ dd_from_deposit_frame <- function(df, name, dd, source_file) {
         s <- sets[[v$value_labels]]
         x <- as.double(s$value[match(as.character(x), s$label)])
       }
-      ext <- NULL
-      if (v$kind == "numeric") ext <- dd_tags(x)
-      em <- attr(x, "extended_missing", exact = TRUE)
+      ext <- dd_tags(x)
       vals <- dd_to_stata_units(x, v$kind)
       attributes(vals) <- NULL
-      if (!is.null(em)) {
-        ext <- integer(length(vals))
-        ext[em] <- match(names(em), letters)
-      }
       if (v$kind == "numeric" && typ %in% c("byte", "int", "long")) {
         it <- dd_int_type(vals)
         ord <- c("byte", "int", "long")

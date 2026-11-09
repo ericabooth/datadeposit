@@ -91,12 +91,14 @@ if c(k) != `K' {
 local j 0
 foreach v of varlist _all {
     local ++j
-    rename `v' __dd_`j'
+    tempvar hold
+    rename `v' `hold'
+    local hold_`j' `hold'
 }
 local order
 forvalues j = 1/`K' {
     local nm = _frval(`FV', stata_name, `j')
-    rename __dd_`j' `nm'
+    rename `hold_`j'' `nm'
     local order `order' `nm'
     * a name that is not a valid Stata name is kept in a characteristic
     local orig = _frval(`FV', name, `j')

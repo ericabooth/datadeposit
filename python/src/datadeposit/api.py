@@ -419,7 +419,13 @@ def datadeposit(data=None, to=None, *, name=None, files=None, folder=None, patte
         _say(quiet, "datadeposit: note: " + rn)
 
     # ---- write
-    _prepare(to, replace, include)
+    if os.path.exists(to) and not os.path.isdir(to):
+        raise DepositError("%s is a file, not a folder; choose another place for the deposit" % to)
+    try:
+        _prepare(to, replace, include)
+    except OSError as e:
+        raise DepositError("cannot write to %s (%s); check that the folder exists and that you may write there"
+                           % (to, e.strerror or e))
     engines = {}
     derived = tables[0].provenance if tables else ""
     ok_rds = True

@@ -1,4 +1,4 @@
 v 3
-d datadeposit: archive-ready data deposits for Stata, R, Python, and Excel
+d datadeposit: prepare data and documentation for colleagues the way a data archive would
 d Eric A. Booth
 p datadeposit

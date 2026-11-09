@@ -9,10 +9,10 @@
 # From a shell:
 #     Rscript setup/nlsw88_setup.R [--root DIR] [--save-rds FILE] [--save-sav FILE]
 #
-# Needs base R 3.5 or newer and nothing else. When the haven package is
-# installed, labelled variables become haven_labelled vectors and extended
-# missing codes (.a to .z) become tagged NAs; set options(datadeposit.haven =
-# FALSE) to stay in base R, and options(datadeposit.exact_doubles = FALSE) to
+# Needs base R 3.5 or newer and nothing else. Extended missing codes (.a to
+# .z) become tagged NAs that haven::na_tag() can read. When the haven package
+# is installed, labelled variables also get the haven_labelled class; set
+# options(datadeposit.haven = FALSE) to keep plain vectors, and options(datadeposit.exact_doubles = FALSE) to
 # skip the exact-double check (faster on big files; see below). Every label, value label, note, and characteristic
 # comes from the metadata tables, so you can edit those tables and rerun.
 
@@ -226,6 +226,15 @@ local({
     y
   }
 
+  # Extended missing codes (.a to .z) are kept inside the NA itself, in the
+  # layout haven uses for tagged NAs, so a code follows its row through any
+  # subset or sort. Built here in base R; haven::na_tag() reads the same bits.
+  tag_na <- function(tags) {
+    b <- rep(as.raw(c(0xa2, 0x07, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x7f)), length(tags))
+    b[seq(5, by = 8, length.out = length(tags))] <- charToRaw(paste(tags, collapse = ""))
+    readBin(b, "double", n = length(tags), size = 8, endian = "little")
+  }
+
   nlab <- 0L
   for (j in seq_len(K)) {
     v <- vars[j, ]
@@ -254,25 +263,17 @@ local({
         x <- y
       }
     }
-    labs <- NULL
-    labs_ext <- NULL
+    if (!is.null(ext)) {
+      a <- attributes(x)
+      x <- as.double(unclass(x))
+      x[ext] <- tag_na(names(ext))
+      attributes(x) <- a
+    }
     if (nzchar(v$value_labels) && !is.null(sets[[v$value_labels]])) {
       sv <- set_vector(sets[[v$value_labels]])
       labs <- sv$num
-      labs_ext <- sv$ext
-    }
-    if (v$kind == "numeric" && use_haven) {
-      if (!is.null(ext)) x[ext] <- haven::tagged_na(names(ext))
-      ext <- NULL
-      if (!is.null(labs)) {
-        if (length(labs_ext)) {
-          labs <- c(labs, stats::setNames(haven::tagged_na(substr(labs_ext, 2, 2)), names(labs_ext)))
-          labs_ext <- NULL
-        }
-        x <- haven::labelled(x, labels = labs)
-      }
-    } else if (!is.null(labs)) {
-      attr(x, "labels") <- labs
+      if (length(sv$ext)) labs <- c(labs, stats::setNames(tag_na(substr(sv$ext, 2, 2)), names(sv$ext)))
+      if (v$kind == "numeric" && use_haven) x <- haven::labelled(x, labels = labs) else attr(x, "labels") <- labs
     }
     if (nzchar(v$label)) { attr(x, "label") <- v$label; nlab <- nlab + 1L }
     attr(x, "format.stata") <- v$format
@@ -280,8 +281,6 @@ local({
     if (length(cf$notes)) attr(x, "notes") <- cf$notes
     if (length(cf$chars)) attr(x, "stata_chars") <- cf$chars
     if (nzchar(qchar) && !is.na(cf$chars[qchar])) attr(x, "question") <- unname(cf$chars[qchar])
-    if (!is.null(ext)) attr(x, "extended_missing") <- ext
-    if (length(labs_ext)) attr(x, "labels_extended") <- labs_ext
     d[[j]] <- x
   }
 

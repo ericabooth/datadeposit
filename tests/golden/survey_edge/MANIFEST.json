@@ -2,7 +2,7 @@
   "datadeposit": "1.0",
   "package": "datadeposit 0.1.0",
   "software": "Stata 19.5",
-  "created": "2026-11-09T16:34:04",
+  "created": "2026-11-09T16:50:23",
   "title": "Parity fixture survey_edge",
   "version": "1",
   "changes": "",
@@ -17,7 +17,7 @@
     {"path": "codebook/survey_edge_ddi.xml", "bytes": 76866, "sha256": "", "engine": "stata"},
     {"path": "data/survey_edge.csv", "bytes": 64319, "sha256": "", "engine": "stata"},
     {"path": "data/survey_edge.dta", "bytes": 122373, "sha256": "", "engine": "stata"},
-    {"path": "data/survey_edge.rds", "bytes": 20375, "sha256": "", "engine": "R via setup.R"},
+    {"path": "data/survey_edge.rds", "bytes": 20347, "sha256": "", "engine": "R via setup.R"},
     {"path": "datapackage.json", "bytes": 72818, "sha256": "", "engine": "stata"},
     {"path": "metadata/survey_edge_chars.csv", "bytes": 67783, "sha256": "", "engine": "stata"},
     {"path": "metadata/survey_edge_dataset.csv", "bytes": 204, "sha256": "", "engine": "stata"},
@@ -25,8 +25,8 @@
     {"path": "metadata/survey_edge_summary.csv", "bytes": 1043, "sha256": "", "engine": "stata"},
     {"path": "metadata/survey_edge_valuelabels.csv", "bytes": 486, "sha256": "", "engine": "stata"},
     {"path": "metadata/survey_edge_variables.csv", "bytes": 1281, "sha256": "", "engine": "stata"},
-    {"path": "setup/survey_edge_setup.R", "bytes": 13236, "sha256": "", "engine": "stata"},
-    {"path": "setup/survey_edge_setup.do", "bytes": 8699, "sha256": "", "engine": "stata"},
-    {"path": "setup/survey_edge_setup.py", "bytes": 8254, "sha256": "", "engine": "stata"}
+    {"path": "setup/survey_edge_setup.R", "bytes": 13514, "sha256": "", "engine": "stata"},
+    {"path": "setup/survey_edge_setup.do", "bytes": 8742, "sha256": "", "engine": "stata"},
+    {"path": "setup/survey_edge_setup.py", "bytes": 9474, "sha256": "", "engine": "stata"}
   ]
 }

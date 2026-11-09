@@ -176,17 +176,25 @@ Blocks follow variable position; values follow the value label order.
 | Stata | R attribute | Python `df.attrs["datadeposit"]` key |
 |-------|-------------|--------------------------------------|
 | variable label | `label` | `column_labels[var]` |
-| value labels | `labels` (haven_labelled when haven is installed) | `variable_value_labels[var]` |
+| value labels | `labels`, with tagged NAs for labelled extended codes (class haven_labelled when haven is installed) | `variable_value_labels[var]` |
 | display format | `format.stata` | `formats[var]` |
 | notes on a variable | `notes` (character vector) | `notes[var]` |
 | other characteristics | `stata_chars` (named character vector) | `chars[var]` |
 | item text (`question_char`) | `question` | `questions[var]` |
-| extended missing | haven `tagged_na`, else `extended_missing` (row positions named by letter) | `extended_missing[var]` (letter to row indices) |
+| extended missing | a tagged NA in haven's layout, written and read in base R (`haven::na_tag()` reads it) | the code is in the low byte of the NaN (`datadeposit.missing_codes()` reads it); `extended_missing[var]` lists the positions at load time |
 | dataset label, notes, chars | attributes on the data frame | `file_label`, `notes["_dta"]`, `chars["_dta"]` |
 
 Python also mirrors pyreadstat names at the top of `df.attrs`
 (`column_names_to_labels`, `variable_value_labels`, `value_labels`,
 `variable_to_label`) so code written for pyreadstat keeps working.
+
+Extended missing codes are stored inside the missing value so that a code
+stays with its row when a user filters, sorts, or merges. In R the value is
+an NA whose fifth byte is the letter, which is haven's tagged-NA layout. In
+Python it is a quiet NaN whose low byte is 1 (`.a`) to 26 (`.z`). A Python
+datetime cannot hold a code, so date and datetime columns fall back to the
+load-time positions, and a writer drops the codes with a note when the rows
+have changed.
 
 ## 6. Versions
 
@@ -199,6 +207,12 @@ deposit (path, version, and the sha256 of its MANIFEST.json) under
 itself a deposit (it holds a MANIFEST.json written by datadeposit); it
 deletes the files that manifest lists and nothing else.
 
+A writer creates `MANIFEST.json` first, with `"status": "incomplete"` and
+an empty file list, and overwrites it with the real manifest as its last
+step. A reader that finds the incomplete marker reports that the deposit
+did not finish. `replace` on such a folder removes the files in the five
+deposit subfolders, `README.md`, and `datapackage.json`.
+
 ## 7. Parity contract
 
 For the same input `.dta`, all three writers must produce:
@@ -209,3 +223,51 @@ For the same input `.dta`, all three writers must produce:
 - `*_summary.csv` equal within tolerance;
 - `datapackage.json` and `*_ddi.xml` equal after removing the fields that
   name the writer, its version, or the creation time.
+
+## 8. Reading source files
+
+Writers accept files from disk and identify each by its first 64 KB, not by
+its extension. All three follow the same rules, and `tests/torture/` checks
+that they reach the same decision on each input.
+
+| First bytes | Treated as |
+|---|---|
+| `<stata_dta>` | Stata 13 or newer (formats 117 to 119), read with full metadata |
+| a Stata release byte (104 to 115) | older Stata; values and labels only |
+| `PK\x03\x04` with `xl/` | Excel `.xlsx` (first sheet) |
+| `\xd0\xcf\x11\xe0` | Excel `.xls` |
+| `$FL2`, `$FL3` | SPSS `.sav` |
+| `\x1f\x8b` | gzip; the content must be delimited text |
+| `PAR1`, R serialization headers | Parquet, `.rds`; read only by the languages that can |
+| a UTF-16 byte-order mark | UTF-16 text, converted to UTF-8 |
+| any zero byte | binary: refused |
+| valid UTF-8, else Latin-1 | text, examined as below |
+
+Text is a table when one of comma, tab, pipe, or semicolon gives every
+record the same number of fields (more than one), counting fields with
+double-quote rules. When several delimiters qualify, the one with the most
+fields wins. A semicolon file whose numbers use a decimal comma is read
+that way. A one-column file counts as a table only when its extension is
+`.csv`, `.tsv`, `.txt`, `.psv`, or `.dat`, its first line is a valid
+variable name, and no line exceeds 80 characters. Files with code or
+document extensions are never data.
+
+Delimited text is read as text and then typed. A column becomes numeric
+only when every non-missing value is a number and none starts with a zero
+followed by a digit. The tokens empty, `NA`, `N/A`, `NaN`, `nan`, `null`,
+`NULL`, and `.` are missing in a numeric column and ordinary text in a
+string column. Integer columns get the smallest Stata integer type that
+fits, other numeric columns `double`, and string columns `str#` at the
+longest byte length. Rows in which every field is empty are dropped. A
+repeated column name gets the suffix `_2`, `_3`, and so on; an empty one
+becomes `v` plus its position.
+
+A name that is not a valid Stata name gets a `stata_name`: characters
+other than letters, digits, and underscore become `_`; a leading digit
+gets a `_` prefix; reserved words get a `_` suffix; names are cut to 32
+characters and made unique with numeric suffixes.
+
+Values Stata cannot store are converted before types are chosen, and the
+writer prints a note: infinite and out-of-range numbers become missing,
+integers beyond 2^53 become text, time zones are converted to UTC, time
+spans become seconds, and list, dictionary, and complex values become text.

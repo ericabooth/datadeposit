@@ -35,6 +35,31 @@ and a pandas Categorical becomes labelled codes. A `.dta` path passed straight t
 keeps more: notes, characteristics, shared value label sets, and label languages, which
 the R and Python packages read with their own `.dta` reader.
 
+## Deposit a file that is not a Stata file, or a whole folder
+
+You can deposit text, Excel, and SPSS files without converting them first. The command
+reads the start of each file to decide what it is, so a pipe-delimited export named
+`.txt` or a Stata file renamed by an email system is read correctly.
+
+```stata
+datadeposit, files("exports/responses.txt") to(responses_deposit)
+datadeposit, folder("exports") pattern("*") to(exports_deposit)
+```
+```r
+datadeposit("exports/responses.txt", to = "responses_deposit")
+datadeposit(folder = "exports", pattern = "*", to = "exports_deposit")
+```
+```python
+datadeposit("exports/responses.txt", to="responses_deposit")
+datadeposit(folder="exports", pattern="*", to="exports_deposit")
+```
+
+Read the notes the command prints. They tell you what it decided on the way in: which
+delimiter and encoding it found, which columns it kept as text because the values start
+with 0, and which column names it changed. In folder mode it also lists every file it
+skipped, with the reason. If you want the questionnaire or the cleaning script in the
+deposit, pass them with `include()`, and they are copied into `docs/`.
+
 ## Open a deposit someone sent you
 
 You do not need the `datadeposit` package to use a deposit. Each language needs only
@@ -51,12 +76,16 @@ setwd("survey_deposit")
 source("setup/survey_setup.R")             # creates the data frame `survey`
 attr(survey$q1, "question")                # item text
 attr(survey$q1, "labels")                  # value labels
+haven::na_tag(survey$q1)                   # "d" for Don't know, "r" for Refused
 ```
 ```python
 import runpy
 df = runpy.run_path("survey_deposit/setup/survey_setup.py")["load"]()
 df.attrs["datadeposit"]["questions"]["q1"]    # item text
 df.attrs["variable_value_labels"]["q1"]       # value labels
+
+from datadeposit import missing_codes         # needs the datadeposit package
+missing_codes(df["q1"]).value_counts()        # ".d" Don't know, ".r" Refused
 ```
 
 In Excel, open `data/survey.csv` with Data > From Text/CSV (which reads the file as

@@ -1,6 +1,6 @@
 # Parity fixture survey_edge
 
-This folder is an archive-ready data deposit. It holds the data, a codebook, and setup scripts that rebuild the labelled data in Stata, R, and Python from the plain-text csv. It was written by datadeposit 0.1.0 in Stata 19.5 on 2026-11-09T16:34:03.
+This folder is an archive-ready data deposit. It holds the data, a codebook, and setup scripts that rebuild the labelled data in Stata, R, and Python from the plain-text csv. It was written by datadeposit 0.1.0 in Stata 19.5 on 2026-11-09T16:50:23.
 
 | Item | Value |
 |---|---|
@@ -54,7 +54,7 @@ df.attrs["column_names_to_labels"]   # variable labels
 | codebook/survey_edge_ddi.xml | 76,866 | DDI Codebook 2.5 for data archives |
 | data/survey_edge.csv | 64,319 | the data, plain text (codes, not labels) |
 | data/survey_edge.dta | 122,373 | the data for Stata |
-| data/survey_edge.rds | 20,375 | the data for R (base data.frame with attributes) |
+| data/survey_edge.rds | 20,347 | the data for R (base data.frame with attributes) |
 | datapackage.json | 72,818 | Frictionless Data Package description |
 | metadata/survey_edge_chars.csv | 67,783 | notes and characteristics, including item text |
 | metadata/survey_edge_dataset.csv | 204 | dataset label, size, sort order |
@@ -62,9 +62,9 @@ df.attrs["column_names_to_labels"]   # variable labels
 | metadata/survey_edge_summary.csv | 1,043 | statistics for each variable |
 | metadata/survey_edge_valuelabels.csv | 486 | every value label |
 | metadata/survey_edge_variables.csv | 1,281 | one row per variable: type, format, label, value label set |
-| setup/survey_edge_setup.R | 13,236 | rebuilds the data in R |
-| setup/survey_edge_setup.do | 8,699 | rebuilds the data in Stata |
-| setup/survey_edge_setup.py | 8,254 | rebuilds the data in Python |
+| setup/survey_edge_setup.R | 13,514 | rebuilds the data in R |
+| setup/survey_edge_setup.do | 8,742 | rebuilds the data in Stata |
+| setup/survey_edge_setup.py | 9,474 | rebuilds the data in Python |
 | MANIFEST.json | | sizes and sha256 hashes of every file |
 
 ## Checking and changing this deposit

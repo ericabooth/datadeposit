@@ -335,9 +335,11 @@ dd_write_codebook_md <- function(root, ds) {
   out <- paste0(out, paste0("| ", seq_len(nrow(V)), " | ", V$stata_name, " | ", dd_mdcell(V$label), " | ",
                             V$stata_type, " | ", V$value_labels, " |\n", collapse = ""))
   out <- paste0(out, "\n")
+  head <- out
+  parts <- character(nrow(V))   # one piece per variable keeps long codebooks linear in time
   for (k in seq_len(nrow(V))) {
     nm <- V$stata_name[k]
-    out <- paste0(out, "### ", nm, "\n\n")
+    out <- paste0("### ", nm, "\n\n")
     if (nzchar(V$label[k])) out <- paste0(out, "**Label:** ", dd_mdcell(V$label[k]), "\n\n")
     if (nzchar(qchar)) {
       w <- which(C$variable == nm & C$char == qchar)
@@ -367,9 +369,9 @@ dd_write_codebook_md <- function(root, ds) {
       }
       out <- paste0(out, "\n")
     }
-    out <- paste0(out, dd_md_chars(nm, C, qchar))
+    parts[k] <- paste0(out, dd_md_chars(nm, C, qchar))
   }
-  dd_spit(file.path(root, "codebook", paste0(ds, "_codebook.md")), out)
+  dd_spit(file.path(root, "codebook", paste0(ds, "_codebook.md")), paste0(head, paste(parts, collapse = "")))
 }
 
 dd_ddistat <- function(type, v) if (nzchar(v)) paste0('      <sumStat type="', type, '">', v, "</sumStat>\n") else ""

@@ -260,7 +260,11 @@ dd_prepare <- function(to, replace, docs) {
       if (dir.exists(d) && !length(list.files(d, all.files = TRUE, no.. = TRUE))) unlink(d, recursive = TRUE)
     }
   }
+  if (file.exists(to) && !dir.exists(to)) stop(to, " is a file, not a folder; choose another place for the deposit", call. = FALSE)
   for (sub in c("data", "metadata", "codebook", "setup", if (docs) "docs")) dir.create(file.path(to, sub), recursive = TRUE, showWarnings = FALSE)
+  if (!dir.exists(file.path(to, "data")) || file.access(to, 2) != 0) {
+    stop("cannot write to ", to, "; check that the folder exists and that you may write there", call. = FALSE)
+  }
   # mark the folder as an unfinished deposit until MANIFEST.json is written
   dd_spit(file.path(to, "MANIFEST.json"), '{"datadeposit": "1.0", "status": "incomplete", "files": []}\n')
 }

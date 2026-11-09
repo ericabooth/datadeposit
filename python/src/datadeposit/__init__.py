@@ -12,10 +12,12 @@ three write the same folder. See https://github.com/ericabooth/datadeposit.
 
 from .api import (DepositError, datadeposit, deposit_apply, deposit_codebook, deposit_use, deposit_verify,
                   find_rscript)
+from .sources import missing_codes
 
 PACKAGE_VERSION = "0.1.0"
 __version__ = PACKAGE_VERSION
 deposit = datadeposit
 
 __all__ = ["datadeposit", "deposit", "deposit_use", "deposit_verify", "deposit_apply", "deposit_codebook",
+           "missing_codes",
            "DepositError", "find_rscript", "__version__"]

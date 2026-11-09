@@ -159,3 +159,71 @@ def test_apply(tmp_path):
     new = deposit_apply(df, str(out))
     assert new.attrs["column_names_to_labels"]["q1"] == "Trust (local)"
     assert "zipcode" in new.columns and "month" not in new.columns
+
+
+def test_missing_codes_follow_rows(tmp_path):
+    from datadeposit import missing_codes
+    datadeposit(SURVEY, to=str(tmp_path / "a"), quiet=True)
+    d = deposit_use(str(tmp_path / "a"))
+    assert missing_codes(d.q1).value_counts().to_dict() == {"": 463, ".d": 26, ".r": 11}
+    want = missing_codes(d.q1)[d.wave == 1].value_counts().to_dict()
+    for sub in (d[d.wave == 1].reset_index(drop=True), d[d.wave == 1].sort_values("income"),
+                d[d.wave == 1][["id", "q1"]].merge(d[["id", "income"]], on="id")):
+        r = datadeposit(sub, to=str(tmp_path / "b"), replace=True, quiet=True)
+        assert r["verified"] == "passed"
+        assert missing_codes(deposit_use(str(tmp_path / "b")).q1).value_counts().to_dict() == want
+
+
+def test_nullable_types_and_awkward_columns(tmp_path, capsys):
+    import datetime
+    df = pd.DataFrame({
+        "b": pd.array([True, None, False], dtype="boolean"), "i": pd.array([1, None, 3], dtype="Int64"),
+        "d": [datetime.date(2020, 1, 2), None, datetime.date(1950, 5, 6)],
+        "x": [1.5, np.inf, np.nan], "big": np.array([9007199254740993, 1, 2], dtype="int64"),
+        "tz": pd.to_datetime(["2025-01-01 12:00"] * 3).tz_localize("America/Chicago"),
+        "nested": [[1, 2], {"a": 1}, None], "_dta": [1, 2, 3], "in": [1, 2, 3]})
+    r = datadeposit(df, to=str(tmp_path / "q"), name="q")
+    out = capsys.readouterr().out
+    assert r["verified"] == "passed"
+    for word in ("infinite", "2^53", "UTC", "stored as text"):
+        assert word in out
+    back = deposit_use(str(tmp_path / "q"))
+    assert back["big"].iloc[0] == "9007199254740993" and list(back.columns) == list(df.columns)
+
+
+def test_unusable_targets_and_inputs(tmp_path):
+    df = pd.DataFrame({"a": [1]})
+    f = tmp_path / "afile.txt"
+    f.write_text("x")
+    with pytest.raises(DepositError, match="is a file"):
+        datadeposit(df, to=str(f), replace=True, quiet=True)
+    ro = tmp_path / "ro"
+    ro.mkdir()
+    ro.chmod(0o555)
+    try:
+        if not os.access(str(ro), os.W_OK):
+            with pytest.raises(DepositError, match="cannot write"):
+                datadeposit(df, to=str(ro / "x"), quiet=True)
+    finally:
+        ro.chmod(0o755)
+    with pytest.raises(DepositError, match="unique"):
+        datadeposit(pd.DataFrame([[1, 2]], columns=["a", "a"]), to=str(tmp_path / "d"), quiet=True)
+    with pytest.raises(DepositError, match="not found"):
+        datadeposit("no_such_file.dta", to=str(tmp_path / "n"), quiet=True)
+    with pytest.raises(DepositError, match="not a datadeposit folder"):
+        deposit_use(str(tmp_path))
+
+
+def test_wide_file_is_fast(tmp_path):
+    import time
+    k = 1500
+    df = pd.DataFrame({"q%d" % j: np.arange(50) % 5 + 1 for j in range(k)})
+    df.attrs["column_names_to_labels"] = {"q%d" % j: "Question %d" % j for j in range(k)}
+    t = time.time()
+    r = datadeposit(df, to=str(tmp_path / "w"), name="wide", formats=["csv", "dta"], quiet=True)
+    assert r["verified"] == "passed"
+    assert time.time() - t < 120
+    d = deposit_use(str(tmp_path / "w"))
+    t = time.time()
+    _ = [d[c].sum() for c in d.columns[:300]]
+    assert time.time() - t < 5      # metadata is shared, not copied, on each column access
