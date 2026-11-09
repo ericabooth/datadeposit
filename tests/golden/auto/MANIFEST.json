@@ -1,0 +1,32 @@
+{
+  "datadeposit": "1.0",
+  "package": "datadeposit 0.1.0",
+  "software": "Stata 19.5",
+  "created": "2026-11-09T16:34:05",
+  "title": "Parity fixture auto",
+  "version": "1",
+  "changes": "",
+  "profile": "full",
+  "derived_from": null,
+  "size_check": {"max_gb": 5, "largest_file_gb": 0, "override": "none"},
+  "datasets": ["auto"],
+  "files": [
+    {"path": "README.md", "bytes": 2966, "sha256": "", "engine": "stata"},
+    {"path": "codebook/auto_codebook.md", "bytes": 2949, "sha256": "", "engine": "stata"},
+    {"path": "codebook/auto_codebook.xlsx", "bytes": 7226, "sha256": "", "engine": "stata"},
+    {"path": "codebook/auto_ddi.xml", "bytes": 5742, "sha256": "", "engine": "stata"},
+    {"path": "data/auto.csv", "bytes": 4472, "sha256": "", "engine": "stata"},
+    {"path": "data/auto.dta", "bytes": 12765, "sha256": "", "engine": "stata"},
+    {"path": "data/auto.rds", "bytes": 3311, "sha256": "", "engine": "R via setup.R"},
+    {"path": "datapackage.json", "bytes": 4011, "sha256": "", "engine": "stata"},
+    {"path": "metadata/auto_chars.csv", "bytes": 156, "sha256": "", "engine": "stata"},
+    {"path": "metadata/auto_dataset.csv", "bytes": 175, "sha256": "", "engine": "stata"},
+    {"path": "metadata/auto_frequencies.csv", "bytes": 94, "sha256": "", "engine": "stata"},
+    {"path": "metadata/auto_summary.csv", "bytes": 920, "sha256": "", "engine": "stata"},
+    {"path": "metadata/auto_valuelabels.csv", "bytes": 69, "sha256": "", "engine": "stata"},
+    {"path": "metadata/auto_variables.csv", "bytes": 966, "sha256": "", "engine": "stata"},
+    {"path": "setup/auto_setup.R", "bytes": 13180, "sha256": "", "engine": "stata"},
+    {"path": "setup/auto_setup.do", "bytes": 8622, "sha256": "", "engine": "stata"},
+    {"path": "setup/auto_setup.py", "bytes": 8212, "sha256": "", "engine": "stata"}
+  ]
+}

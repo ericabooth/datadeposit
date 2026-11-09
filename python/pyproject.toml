@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datadeposit"
+version = "0.1.0"
+description = "Archive-ready data deposits that open the same way in Stata, R, Python, and Excel"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "Eric A. Booth", email = "eric.a.booth@gmail.com"}]
+dependencies = ["pandas>=1.5", "numpy>=1.21"]
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.0"]
+spss = ["pyreadstat>=1.2"]
+all = ["openpyxl>=3.0", "pyreadstat>=1.2"]
+test = ["pytest>=7", "openpyxl>=3.0"]
+
+[project.urls]
+Homepage = "https://github.com/ericabooth/datadeposit"
+
+[project.scripts]
+datadeposit = "datadeposit.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+datadeposit = ["templates/setup.do", "templates/setup.R", "templates/setup.py"]

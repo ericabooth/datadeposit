@@ -1,0 +1,32 @@
+{
+  "datadeposit": "1.0",
+  "package": "datadeposit 0.1.0",
+  "software": "Stata 19.5",
+  "created": "2026-11-09T16:34:06",
+  "title": "Parity fixture nlsw88",
+  "version": "1",
+  "changes": "",
+  "profile": "full",
+  "derived_from": null,
+  "size_check": {"max_gb": 5, "largest_file_gb": 0, "override": "none"},
+  "datasets": ["nlsw88"],
+  "files": [
+    {"path": "README.md", "bytes": 3034, "sha256": "", "engine": "stata"},
+    {"path": "codebook/nlsw88_codebook.md", "bytes": 6171, "sha256": "", "engine": "stata"},
+    {"path": "codebook/nlsw88_codebook.xlsx", "bytes": 9833, "sha256": "", "engine": "stata"},
+    {"path": "codebook/nlsw88_ddi.xml", "bytes": 13999, "sha256": "", "engine": "stata"},
+    {"path": "data/nlsw88.csv", "bytes": 143689, "sha256": "", "engine": "stata"},
+    {"path": "data/nlsw88.dta", "bytes": 76434, "sha256": "", "engine": "stata"},
+    {"path": "data/nlsw88.rds", "bytes": 42957, "sha256": "", "engine": "R via setup.R"},
+    {"path": "datapackage.json", "bytes": 7365, "sha256": "", "engine": "stata"},
+    {"path": "metadata/nlsw88_chars.csv", "bytes": 405, "sha256": "", "engine": "stata"},
+    {"path": "metadata/nlsw88_dataset.csv", "bytes": 178, "sha256": "", "engine": "stata"},
+    {"path": "metadata/nlsw88_frequencies.csv", "bytes": 1620, "sha256": "", "engine": "stata"},
+    {"path": "metadata/nlsw88_summary.csv", "bytes": 1346, "sha256": "", "engine": "stata"},
+    {"path": "metadata/nlsw88_valuelabels.csv", "bytes": 1236, "sha256": "", "engine": "stata"},
+    {"path": "metadata/nlsw88_variables.csv", "bytes": 1412, "sha256": "", "engine": "stata"},
+    {"path": "setup/nlsw88_setup.R", "bytes": 13196, "sha256": "", "engine": "stata"},
+    {"path": "setup/nlsw88_setup.do", "bytes": 8644, "sha256": "", "engine": "stata"},
+    {"path": "setup/nlsw88_setup.py", "bytes": 8224, "sha256": "", "engine": "stata"}
+  ]
+}

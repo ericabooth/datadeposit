@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+*.smcl
+.Rhistory
+.RData
+.Rproj.user/
+tests/out/
+python/build/
+python/dist/
+python/src/*.egg-info/
+r/*.tar.gz
+r/..Rcheck/
+dist/

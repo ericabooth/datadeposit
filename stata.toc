@@ -1,0 +1,4 @@
+v 3
+d datadeposit: archive-ready data deposits for Stata, R, Python, and Excel
+d Eric A. Booth
+p datadeposit

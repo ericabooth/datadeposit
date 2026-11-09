@@ -1,0 +1,109 @@
+{
+  "name": "auto",
+  "title": "Parity fixture auto",
+  "version": "1",
+  "created": "2026-11-09T16:34:04",
+  "contributors": [
+    {"title": "Eric A. Booth", "roles": ["author"]}
+  ],
+  "licenses": [{"name": "CC-BY-4.0"}],
+  "resources": [
+    {
+      "name": "auto",
+      "path": "data/auto.csv",
+      "title": "1978 automobile data",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "schema": {
+        "fields": [
+          {
+            "name": "make",
+            "type": "string",
+            "title": "Make and model",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "make", "type": "str18", "format": "%-18s", "valueLabels": ""}
+          },
+          {
+            "name": "price",
+            "type": "integer",
+            "title": "Price",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "price", "type": "int", "format": "%8.0gc", "valueLabels": ""}
+          },
+          {
+            "name": "mpg",
+            "type": "integer",
+            "title": "Mileage (mpg)",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "mpg", "type": "int", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "rep78",
+            "type": "integer",
+            "title": "Repair record 1978",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "rep78", "type": "int", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "headroom",
+            "type": "number",
+            "title": "Headroom (in.)",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "headroom", "type": "float", "format": "%6.1f", "valueLabels": ""}
+          },
+          {
+            "name": "trunk",
+            "type": "integer",
+            "title": "Trunk space (cu. ft.)",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "trunk", "type": "int", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "weight",
+            "type": "integer",
+            "title": "Weight (lbs.)",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "weight", "type": "int", "format": "%8.0gc", "valueLabels": ""}
+          },
+          {
+            "name": "length",
+            "type": "integer",
+            "title": "Length (in.)",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "length", "type": "int", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "turn",
+            "type": "integer",
+            "title": "Turn circle (ft.)",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "turn", "type": "int", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "displacement",
+            "type": "integer",
+            "title": "Displacement (cu. in.)",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "displacement", "type": "int", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "gear_ratio",
+            "type": "number",
+            "title": "Gear ratio",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "gear_ratio", "type": "float", "format": "%6.2f", "valueLabels": ""}
+          },
+          {
+            "name": "foreign",
+            "type": "integer",
+            "title": "Car origin",
+            "categories": [{"value": 0, "label": "Domestic"}, {"value": 1, "label": "Foreign"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "foreign", "type": "byte", "format": "%8.0g", "valueLabels": "origin"}
+          }
+        ]
+      }
+    }
+  ]
+}

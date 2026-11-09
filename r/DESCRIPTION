@@ -1,0 +1,21 @@
+Package: datadeposit
+Type: Package
+Title: Archive-Ready Data Deposits for Stata, R, Python, and Excel
+Version: 0.1.0
+Authors@R: person("Eric A.", "Booth", email = "eric.a.booth@gmail.com", role = c("aut", "cre"))
+Description: Writes a deposit folder in the style of data archives such as ICPSR
+    and Harvard Dataverse: the data as csv plus Stata, R, and optional Excel and
+    SPSS copies; a codebook in Markdown, Excel, DDI Codebook 2.5, and Frictionless
+    Data Package form; and setup scripts that rebuild the labelled data from the
+    csv in Stata, R, and Python. Reads and writes Stata .dta files with their
+    characteristics, notes, shared value label sets, label languages, and
+    extended missing values, so survey item text travels with the data.
+License: MIT + file LICENSE
+URL: https://github.com/ericabooth/datadeposit
+BugReports: https://github.com/ericabooth/datadeposit/issues
+Encoding: UTF-8
+Depends: R (>= 4.1)
+Imports: jsonlite, stats, tools, utils
+Suggests: haven, writexl, readxl, digest, testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1

@@ -1,0 +1,25 @@
+v 3
+d datadeposit: archive-ready data deposits that open the same way in Stata, R, Python, and Excel
+d
+d datadeposit writes the kind of folder that data archives such as ICPSR and
+d Harvard Dataverse distribute: the data as csv plus Stata and R copies, a
+d codebook (Markdown, Excel, DDI Codebook 2.5, Frictionless datapackage.json),
+d and setup scripts that rebuild the labelled data from the csv in Stata, R,
+d and Python. Variable labels, value labels, extended missing codes, notes,
+d label languages, and survey item text stored in characteristics all travel
+d with the data. A size check stops deposits with files over 5 GB unless you
+d choose the lean profile (native file plus csv), nodata, or allowlarge.
+d
+d The same command exists in R and Python; all three write the same folder.
+d
+d Start with: help datadeposit
+d
+d Requires: Stata version 16
+d
+d Author: Eric A. Booth
+d Support: email eric.a.booth@gmail.com
+d
+d Version: 0.1.0
+d Distribution-Date: 20261109
+f stata/src/datadeposit.ado
+f stata/src/datadeposit.sthlp

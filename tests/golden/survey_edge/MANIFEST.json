@@ -1,0 +1,32 @@
+{
+  "datadeposit": "1.0",
+  "package": "datadeposit 0.1.0",
+  "software": "Stata 19.5",
+  "created": "2026-11-09T16:34:04",
+  "title": "Parity fixture survey_edge",
+  "version": "1",
+  "changes": "",
+  "profile": "full",
+  "derived_from": null,
+  "size_check": {"max_gb": 5, "largest_file_gb": 0, "override": "none"},
+  "datasets": ["survey_edge"],
+  "files": [
+    {"path": "README.md", "bytes": 3180, "sha256": "", "engine": "stata"},
+    {"path": "codebook/survey_edge_codebook.md", "bytes": 72194, "sha256": "", "engine": "stata"},
+    {"path": "codebook/survey_edge_codebook.xlsx", "bytes": 9362, "sha256": "", "engine": "stata"},
+    {"path": "codebook/survey_edge_ddi.xml", "bytes": 76866, "sha256": "", "engine": "stata"},
+    {"path": "data/survey_edge.csv", "bytes": 64319, "sha256": "", "engine": "stata"},
+    {"path": "data/survey_edge.dta", "bytes": 122373, "sha256": "", "engine": "stata"},
+    {"path": "data/survey_edge.rds", "bytes": 20375, "sha256": "", "engine": "R via setup.R"},
+    {"path": "datapackage.json", "bytes": 72818, "sha256": "", "engine": "stata"},
+    {"path": "metadata/survey_edge_chars.csv", "bytes": 67783, "sha256": "", "engine": "stata"},
+    {"path": "metadata/survey_edge_dataset.csv", "bytes": 204, "sha256": "", "engine": "stata"},
+    {"path": "metadata/survey_edge_frequencies.csv", "bytes": 772, "sha256": "", "engine": "stata"},
+    {"path": "metadata/survey_edge_summary.csv", "bytes": 1043, "sha256": "", "engine": "stata"},
+    {"path": "metadata/survey_edge_valuelabels.csv", "bytes": 486, "sha256": "", "engine": "stata"},
+    {"path": "metadata/survey_edge_variables.csv", "bytes": 1281, "sha256": "", "engine": "stata"},
+    {"path": "setup/survey_edge_setup.R", "bytes": 13236, "sha256": "", "engine": "stata"},
+    {"path": "setup/survey_edge_setup.do", "bytes": 8699, "sha256": "", "engine": "stata"},
+    {"path": "setup/survey_edge_setup.py", "bytes": 8254, "sha256": "", "engine": "stata"}
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "name": "nlsw88",
+  "title": "Parity fixture nlsw88",
+  "version": "1",
+  "created": "2026-11-09T16:34:05",
+  "contributors": [
+    {"title": "Eric A. Booth", "roles": ["author"]}
+  ],
+  "licenses": [{"name": "CC-BY-4.0"}],
+  "resources": [
+    {
+      "name": "nlsw88",
+      "path": "data/nlsw88.csv",
+      "title": "NLSW, 1988 extract",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "schema": {
+        "fields": [
+          {
+            "name": "idcode",
+            "type": "integer",
+            "title": "NLS ID",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "idcode", "type": "int", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "age",
+            "type": "integer",
+            "title": "Age in current year",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "age", "type": "byte", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "race",
+            "type": "integer",
+            "title": "Race",
+            "categories": [{"value": 1, "label": "White"}, {"value": 2, "label": "Black"}, {"value": 3, "label": "Other"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "race", "type": "byte", "format": "%8.0g", "valueLabels": "racelbl"}
+          },
+          {
+            "name": "married",
+            "type": "integer",
+            "title": "Married",
+            "categories": [{"value": 0, "label": "Single"}, {"value": 1, "label": "Married"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "married", "type": "byte", "format": "%8.0g", "valueLabels": "marlbl"}
+          },
+          {
+            "name": "never_married",
+            "type": "integer",
+            "title": "Never married",
+            "categories": [{"value": 0, "label": "Has been married"}, {"value": 1, "label": "Never married"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "never_married", "type": "byte", "format": "%16.0g", "valueLabels": "nev_mar"}
+          },
+          {
+            "name": "grade",
+            "type": "integer",
+            "title": "Current grade completed",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "grade", "type": "byte", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "collgrad",
+            "type": "integer",
+            "title": "College graduate",
+            "categories": [{"value": 0, "label": "Not college grad"}, {"value": 1, "label": "College grad"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "collgrad", "type": "byte", "format": "%16.0g", "valueLabels": "gradlbl"}
+          },
+          {
+            "name": "south",
+            "type": "integer",
+            "title": "Lives in the south",
+            "categories": [{"value": 0, "label": "Not south"}, {"value": 1, "label": "South"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "south", "type": "byte", "format": "%9.0g", "valueLabels": "southlbl"}
+          },
+          {
+            "name": "smsa",
+            "type": "integer",
+            "title": "Lives in SMSA",
+            "categories": [{"value": 0, "label": "Not SMSA"}, {"value": 1, "label": "SMSA"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "smsa", "type": "byte", "format": "%9.0g", "valueLabels": "smsalbl"}
+          },
+          {
+            "name": "c_city",
+            "type": "integer",
+            "title": "Lives in a central city",
+            "categories": [{"value": 0, "label": "Not central city"}, {"value": 1, "label": "Central city"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "c_city", "type": "byte", "format": "%16.0g", "valueLabels": "ccitylbl"}
+          },
+          {
+            "name": "industry",
+            "type": "integer",
+            "title": "Industry",
+            "categories": [{"value": 1, "label": "Ag/Forestry/Fisheries"}, {"value": 2, "label": "Mining"}, {"value": 3, "label": "Construction"}, {"value": 4, "label": "Manufacturing"}, {"value": 5, "label": "Transport/Comm/Utility"}, {"value": 6, "label": "Wholesale/Retail trade"}, {"value": 7, "label": "Finance/Ins/Real estate"}, {"value": 8, "label": "Business/Repair svc"}, {"value": 9, "label": "Personal services"}, {"value": 10, "label": "Entertainment/Rec svc"}, {"value": 11, "label": "Professional services"}, {"value": 12, "label": "Public administration"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "industry", "type": "byte", "format": "%23.0g", "valueLabels": "indlbl"}
+          },
+          {
+            "name": "occupation",
+            "type": "integer",
+            "title": "Occupation",
+            "categories": [{"value": 1, "label": "Professional/Technical"}, {"value": 2, "label": "Managers/Admin"}, {"value": 3, "label": "Sales"}, {"value": 4, "label": "Clerical/Unskilled"}, {"value": 5, "label": "Craftsmen"}, {"value": 6, "label": "Operatives"}, {"value": 7, "label": "Transport"}, {"value": 8, "label": "Laborers"}, {"value": 9, "label": "Farmers"}, {"value": 10, "label": "Farm laborers"}, {"value": 11, "label": "Service"}, {"value": 12, "label": "Household workers"}, {"value": 13, "label": "Other"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "occupation", "type": "byte", "format": "%22.0g", "valueLabels": "occlbl"}
+          },
+          {
+            "name": "union",
+            "type": "integer",
+            "title": "Union worker",
+            "categories": [{"value": 0, "label": "Nonunion"}, {"value": 1, "label": "Union"}],
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "union", "type": "byte", "format": "%8.0g", "valueLabels": "unionlbl"}
+          },
+          {
+            "name": "wage",
+            "type": "number",
+            "title": "Hourly wage",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "wage", "type": "float", "format": "%9.0g", "valueLabels": ""}
+          },
+          {
+            "name": "hours",
+            "type": "integer",
+            "title": "Usual hours worked",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "hours", "type": "byte", "format": "%8.0g", "valueLabels": ""}
+          },
+          {
+            "name": "ttl_exp",
+            "type": "number",
+            "title": "Total work experience (years)",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "ttl_exp", "type": "float", "format": "%9.0g", "valueLabels": ""}
+          },
+          {
+            "name": "tenure",
+            "type": "number",
+            "title": "Job tenure (years)",
+            "missingValues": [{"value": "", "label": "missing"}],
+            "stata": {"name": "tenure", "type": "float", "format": "%9.0g", "valueLabels": ""}
+          }
+        ]
+      }
+    }
+  ]
+}

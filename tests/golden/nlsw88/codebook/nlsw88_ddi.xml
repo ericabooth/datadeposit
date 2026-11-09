@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<codeBook xmlns="ddi:codebook:2_5" version="2.5">
+  <stdyDscr>
+    <citation>
+      <titlStmt>
+        <titl>NLSW, 1988 extract</titl>
+      </titlStmt>
+    </citation>
+  </stdyDscr>
+  <fileDscr ID="F1">
+    <fileTxt>
+      <fileName>nlsw88.csv</fileName>
+      <dimensns>
+        <caseQnty>2246</caseQnty>
+        <varQnty>17</varQnty>
+      </dimensns>
+      <fileType>text/csv</fileType>
+    </fileTxt>
+  </fileDscr>
+  <dataDscr>
+    <var ID="V1" name="idcode" files="F1" intrvl="contin">
+      <labl>NLS ID</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">1</sumStat>
+      <sumStat type="max">5159</sumStat>
+      <sumStat type="mean">2612.654497</sumStat>
+      <sumStat type="stdev">1480.863763</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V2" name="age" files="F1" intrvl="contin">
+      <labl>Age in current year</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">34</sumStat>
+      <sumStat type="max">46</sumStat>
+      <sumStat type="mean">39.15316118</sumStat>
+      <sumStat type="stdev">3.060002224</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V3" name="race" files="F1" intrvl="discrete">
+      <labl>Race</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">1</sumStat>
+      <sumStat type="max">3</sumStat>
+      <sumStat type="mean">1.282724844</sumStat>
+      <sumStat type="stdev">0.4754412902</sumStat>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>White</labl>
+        <catStat type="freq">1637</catStat>
+      </catgry>
+      <catgry>
+        <catValu>2</catValu>
+        <labl>Black</labl>
+        <catStat type="freq">583</catStat>
+      </catgry>
+      <catgry>
+        <catValu>3</catValu>
+        <labl>Other</labl>
+        <catStat type="freq">26</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V4" name="married" files="F1" intrvl="discrete">
+      <labl>Married</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">1</sumStat>
+      <sumStat type="mean">0.642030276</sumStat>
+      <sumStat type="stdev">0.4795099308</sumStat>
+      <catgry>
+        <catValu>0</catValu>
+        <labl>Single</labl>
+        <catStat type="freq">804</catStat>
+      </catgry>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>Married</labl>
+        <catStat type="freq">1442</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V5" name="never_married" files="F1" intrvl="discrete">
+      <labl>Never married</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">1</sumStat>
+      <sumStat type="mean">0.1041852182</sumStat>
+      <sumStat type="stdev">0.3055687012</sumStat>
+      <catgry>
+        <catValu>0</catValu>
+        <labl>Has been married</labl>
+        <catStat type="freq">2012</catStat>
+      </catgry>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>Never married</labl>
+        <catStat type="freq">234</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%16.0g"/>
+    </var>
+    <var ID="V6" name="grade" files="F1" intrvl="contin">
+      <labl>Current grade completed</labl>
+      <sumStat type="vald">2244</sumStat>
+      <sumStat type="invd">2</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">18</sumStat>
+      <sumStat type="mean">13.09893048</sumStat>
+      <sumStat type="stdev">2.521246095</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V7" name="collgrad" files="F1" intrvl="discrete">
+      <labl>College graduate</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">1</sumStat>
+      <sumStat type="mean">0.2368655387</sumStat>
+      <sumStat type="stdev">0.4252537738</sumStat>
+      <catgry>
+        <catValu>0</catValu>
+        <labl>Not college grad</labl>
+        <catStat type="freq">1714</catStat>
+      </catgry>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>College grad</labl>
+        <catStat type="freq">532</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%16.0g"/>
+    </var>
+    <var ID="V8" name="south" files="F1" intrvl="discrete">
+      <labl>Lives in the south</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">1</sumStat>
+      <sumStat type="mean">0.4194122885</sumStat>
+      <sumStat type="stdev">0.4935727773</sumStat>
+      <catgry>
+        <catValu>0</catValu>
+        <labl>Not south</labl>
+        <catStat type="freq">1304</catStat>
+      </catgry>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>South</labl>
+        <catStat type="freq">942</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%9.0g"/>
+    </var>
+    <var ID="V9" name="smsa" files="F1" intrvl="discrete">
+      <labl>Lives in SMSA</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">1</sumStat>
+      <sumStat type="mean">0.7039180766</sumStat>
+      <sumStat type="stdev">0.4566292307</sumStat>
+      <catgry>
+        <catValu>0</catValu>
+        <labl>Not SMSA</labl>
+        <catStat type="freq">665</catStat>
+      </catgry>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>SMSA</labl>
+        <catStat type="freq">1581</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%9.0g"/>
+    </var>
+    <var ID="V10" name="c_city" files="F1" intrvl="discrete">
+      <labl>Lives in a central city</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">1</sumStat>
+      <sumStat type="mean">0.2916295637</sumStat>
+      <sumStat type="stdev">0.45461388</sumStat>
+      <catgry>
+        <catValu>0</catValu>
+        <labl>Not central city</labl>
+        <catStat type="freq">1591</catStat>
+      </catgry>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>Central city</labl>
+        <catStat type="freq">655</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%16.0g"/>
+    </var>
+    <var ID="V11" name="industry" files="F1" intrvl="discrete">
+      <labl>Industry</labl>
+      <sumStat type="vald">2232</sumStat>
+      <sumStat type="invd">14</sumStat>
+      <sumStat type="min">1</sumStat>
+      <sumStat type="max">12</sumStat>
+      <sumStat type="mean">8.189516129</sumStat>
+      <sumStat type="stdev">3.010874857</sumStat>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>Ag/Forestry/Fisheries</labl>
+        <catStat type="freq">17</catStat>
+      </catgry>
+      <catgry>
+        <catValu>2</catValu>
+        <labl>Mining</labl>
+        <catStat type="freq">4</catStat>
+      </catgry>
+      <catgry>
+        <catValu>3</catValu>
+        <labl>Construction</labl>
+        <catStat type="freq">29</catStat>
+      </catgry>
+      <catgry>
+        <catValu>4</catValu>
+        <labl>Manufacturing</labl>
+        <catStat type="freq">367</catStat>
+      </catgry>
+      <catgry>
+        <catValu>5</catValu>
+        <labl>Transport/Comm/Utility</labl>
+        <catStat type="freq">90</catStat>
+      </catgry>
+      <catgry>
+        <catValu>6</catValu>
+        <labl>Wholesale/Retail trade</labl>
+        <catStat type="freq">333</catStat>
+      </catgry>
+      <catgry>
+        <catValu>7</catValu>
+        <labl>Finance/Ins/Real estate</labl>
+        <catStat type="freq">192</catStat>
+      </catgry>
+      <catgry>
+        <catValu>8</catValu>
+        <labl>Business/Repair svc</labl>
+        <catStat type="freq">86</catStat>
+      </catgry>
+      <catgry>
+        <catValu>9</catValu>
+        <labl>Personal services</labl>
+        <catStat type="freq">97</catStat>
+      </catgry>
+      <catgry>
+        <catValu>10</catValu>
+        <labl>Entertainment/Rec svc</labl>
+        <catStat type="freq">17</catStat>
+      </catgry>
+      <catgry>
+        <catValu>11</catValu>
+        <labl>Professional services</labl>
+        <catStat type="freq">824</catStat>
+      </catgry>
+      <catgry>
+        <catValu>12</catValu>
+        <labl>Public administration</labl>
+        <catStat type="freq">176</catStat>
+      </catgry>
+      <catgry missing="Y">
+        <catValu>.</catValu>
+        <catStat type="freq">14</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%23.0g"/>
+    </var>
+    <var ID="V12" name="occupation" files="F1" intrvl="discrete">
+      <labl>Occupation</labl>
+      <sumStat type="vald">2237</sumStat>
+      <sumStat type="invd">9</sumStat>
+      <sumStat type="min">1</sumStat>
+      <sumStat type="max">13</sumStat>
+      <sumStat type="mean">4.642825212</sumStat>
+      <sumStat type="stdev">3.408897213</sumStat>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>Professional/Technical</labl>
+        <catStat type="freq">317</catStat>
+      </catgry>
+      <catgry>
+        <catValu>2</catValu>
+        <labl>Managers/Admin</labl>
+        <catStat type="freq">264</catStat>
+      </catgry>
+      <catgry>
+        <catValu>3</catValu>
+        <labl>Sales</labl>
+        <catStat type="freq">726</catStat>
+      </catgry>
+      <catgry>
+        <catValu>4</catValu>
+        <labl>Clerical/Unskilled</labl>
+        <catStat type="freq">102</catStat>
+      </catgry>
+      <catgry>
+        <catValu>5</catValu>
+        <labl>Craftsmen</labl>
+        <catStat type="freq">53</catStat>
+      </catgry>
+      <catgry>
+        <catValu>6</catValu>
+        <labl>Operatives</labl>
+        <catStat type="freq">246</catStat>
+      </catgry>
+      <catgry>
+        <catValu>7</catValu>
+        <labl>Transport</labl>
+        <catStat type="freq">28</catStat>
+      </catgry>
+      <catgry>
+        <catValu>8</catValu>
+        <labl>Laborers</labl>
+        <catStat type="freq">286</catStat>
+      </catgry>
+      <catgry>
+        <catValu>9</catValu>
+        <labl>Farmers</labl>
+        <catStat type="freq">1</catStat>
+      </catgry>
+      <catgry>
+        <catValu>10</catValu>
+        <labl>Farm laborers</labl>
+        <catStat type="freq">9</catStat>
+      </catgry>
+      <catgry>
+        <catValu>11</catValu>
+        <labl>Service</labl>
+        <catStat type="freq">16</catStat>
+      </catgry>
+      <catgry>
+        <catValu>12</catValu>
+        <labl>Household workers</labl>
+        <catStat type="freq">2</catStat>
+      </catgry>
+      <catgry>
+        <catValu>13</catValu>
+        <labl>Other</labl>
+        <catStat type="freq">187</catStat>
+      </catgry>
+      <catgry missing="Y">
+        <catValu>.</catValu>
+        <catStat type="freq">9</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%22.0g"/>
+    </var>
+    <var ID="V13" name="union" files="F1" intrvl="discrete">
+      <labl>Union worker</labl>
+      <sumStat type="vald">1878</sumStat>
+      <sumStat type="invd">368</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">1</sumStat>
+      <sumStat type="mean">0.2454739084</sumStat>
+      <sumStat type="stdev">0.4304824567</sumStat>
+      <catgry>
+        <catValu>0</catValu>
+        <labl>Nonunion</labl>
+        <catStat type="freq">1417</catStat>
+      </catgry>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>Union</labl>
+        <catStat type="freq">461</catStat>
+      </catgry>
+      <catgry missing="Y">
+        <catValu>.</catValu>
+        <catStat type="freq">368</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V14" name="wage" files="F1" intrvl="contin">
+      <labl>Hourly wage</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">1.004951835</sumStat>
+      <sumStat type="max">40.74658966</sumStat>
+      <sumStat type="mean">7.766949037</sumStat>
+      <sumStat type="stdev">5.755522859</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%9.0g"/>
+    </var>
+    <var ID="V15" name="hours" files="F1" intrvl="contin">
+      <labl>Usual hours worked</labl>
+      <sumStat type="vald">2242</sumStat>
+      <sumStat type="invd">4</sumStat>
+      <sumStat type="min">1</sumStat>
+      <sumStat type="max">80</sumStat>
+      <sumStat type="mean">37.21810883</sumStat>
+      <sumStat type="stdev">10.50913512</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V16" name="ttl_exp" files="F1" intrvl="contin">
+      <labl>Total work experience (years)</labl>
+      <sumStat type="vald">2246</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">0.115384616</sumStat>
+      <sumStat type="max">28.88461494</sumStat>
+      <sumStat type="mean">12.53497671</sumStat>
+      <sumStat type="stdev">4.610207534</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%9.0g"/>
+    </var>
+    <var ID="V17" name="tenure" files="F1" intrvl="contin">
+      <labl>Job tenure (years)</labl>
+      <sumStat type="vald">2231</sumStat>
+      <sumStat type="invd">15</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">25.91666603</sumStat>
+      <sumStat type="mean">5.977849999</sumStat>
+      <sumStat type="stdev">5.510331212</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%9.0g"/>
+    </var>
+  </dataDscr>
+</codeBook>

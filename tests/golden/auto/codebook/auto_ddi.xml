@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<codeBook xmlns="ddi:codebook:2_5" version="2.5">
+  <stdyDscr>
+    <citation>
+      <titlStmt>
+        <titl>1978 automobile data</titl>
+      </titlStmt>
+    </citation>
+  </stdyDscr>
+  <fileDscr ID="F1">
+    <fileTxt>
+      <fileName>auto.csv</fileName>
+      <dimensns>
+        <caseQnty>74</caseQnty>
+        <varQnty>12</varQnty>
+      </dimensns>
+      <fileType>text/csv</fileType>
+    </fileTxt>
+  </fileDscr>
+  <dataDscr>
+    <var ID="V1" name="make" files="F1">
+      <labl>Make and model</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <varFormat type="character" schema="other" formatname="%-18s"/>
+    </var>
+    <var ID="V2" name="price" files="F1" intrvl="contin">
+      <labl>Price</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">3291</sumStat>
+      <sumStat type="max">15906</sumStat>
+      <sumStat type="mean">6165.256757</sumStat>
+      <sumStat type="stdev">2949.495885</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0gc"/>
+    </var>
+    <var ID="V3" name="mpg" files="F1" intrvl="contin">
+      <labl>Mileage (mpg)</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">12</sumStat>
+      <sumStat type="max">41</sumStat>
+      <sumStat type="mean">21.2972973</sumStat>
+      <sumStat type="stdev">5.78550321</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V4" name="rep78" files="F1" intrvl="contin">
+      <labl>Repair record 1978</labl>
+      <sumStat type="vald">69</sumStat>
+      <sumStat type="invd">5</sumStat>
+      <sumStat type="min">1</sumStat>
+      <sumStat type="max">5</sumStat>
+      <sumStat type="mean">3.405797101</sumStat>
+      <sumStat type="stdev">0.9899322701</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V5" name="headroom" files="F1" intrvl="contin">
+      <labl>Headroom (in.)</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">1.5</sumStat>
+      <sumStat type="max">5</sumStat>
+      <sumStat type="mean">2.993243243</sumStat>
+      <sumStat type="stdev">0.8459947668</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%6.1f"/>
+    </var>
+    <var ID="V6" name="trunk" files="F1" intrvl="contin">
+      <labl>Trunk space (cu. ft.)</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">5</sumStat>
+      <sumStat type="max">23</sumStat>
+      <sumStat type="mean">13.75675676</sumStat>
+      <sumStat type="stdev">4.277404189</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V7" name="weight" files="F1" intrvl="contin">
+      <labl>Weight (lbs.)</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">1760</sumStat>
+      <sumStat type="max">4840</sumStat>
+      <sumStat type="mean">3019.459459</sumStat>
+      <sumStat type="stdev">777.1935671</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0gc"/>
+    </var>
+    <var ID="V8" name="length" files="F1" intrvl="contin">
+      <labl>Length (in.)</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">142</sumStat>
+      <sumStat type="max">233</sumStat>
+      <sumStat type="mean">187.9324324</sumStat>
+      <sumStat type="stdev">22.2663399</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V9" name="turn" files="F1" intrvl="contin">
+      <labl>Turn circle (ft.)</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">31</sumStat>
+      <sumStat type="max">51</sumStat>
+      <sumStat type="mean">39.64864865</sumStat>
+      <sumStat type="stdev">4.399353727</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V10" name="displacement" files="F1" intrvl="contin">
+      <labl>Displacement (cu. in.)</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">79</sumStat>
+      <sumStat type="max">425</sumStat>
+      <sumStat type="mean">197.2972973</sumStat>
+      <sumStat type="stdev">91.83721896</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+    <var ID="V11" name="gear_ratio" files="F1" intrvl="contin">
+      <labl>Gear ratio</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">2.190000057</sumStat>
+      <sumStat type="max">3.890000105</sumStat>
+      <sumStat type="mean">3.014864867</sumStat>
+      <sumStat type="stdev">0.4562870967</sumStat>
+      <varFormat type="numeric" schema="other" formatname="%6.2f"/>
+    </var>
+    <var ID="V12" name="foreign" files="F1" intrvl="discrete">
+      <labl>Car origin</labl>
+      <sumStat type="vald">74</sumStat>
+      <sumStat type="invd">0</sumStat>
+      <sumStat type="min">0</sumStat>
+      <sumStat type="max">1</sumStat>
+      <sumStat type="mean">0.2972972973</sumStat>
+      <sumStat type="stdev">0.4601884584</sumStat>
+      <catgry>
+        <catValu>0</catValu>
+        <labl>Domestic</labl>
+        <catStat type="freq">52</catStat>
+      </catgry>
+      <catgry>
+        <catValu>1</catValu>
+        <labl>Foreign</labl>
+        <catStat type="freq">22</catStat>
+      </catgry>
+      <varFormat type="numeric" schema="other" formatname="%8.0g"/>
+    </var>
+  </dataDscr>
+</codeBook>
