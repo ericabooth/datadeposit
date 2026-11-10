@@ -9,7 +9,7 @@ Description: Writes a deposit folder in the style of data archives such as ICPSR
     Data Package form; and setup scripts that rebuild the labelled data from the
     csv in Stata, R, and Python. Reads and writes Stata .dta files with their
     characteristics, notes, shared value label sets, label languages, and
-    extended missing values, so survey item text travels with the data.
+    extended missing values, so survey item text is kept with the data.
 License: MIT + file LICENSE
 URL: https://github.com/ericabooth/datadeposit
 BugReports: https://github.com/ericabooth/datadeposit/issues

@@ -24,7 +24,7 @@ file stem (for example `survey2025`).
   metadata/
     <ds>_variables.csv          one row per variable
     <ds>_valuelabels.csv        one row per value label entry
-    <ds>_chars.csv              one row per characteristic (Stata notes live here)
+    <ds>_chars.csv              one row per characteristic (Stata notes are stored here)
     <ds>_dataset.csv            dataset-level facts (key, value)
     <ds>_summary.csv            per-variable statistics (omitted with nostats)
     <ds>_frequencies.csv        counts for every labelled variable (omitted with nostats)
@@ -144,7 +144,7 @@ work again after `setup.do`. Label-language bookkeeping (`_lang_*`) is
 also stored here unchanged. Rows sort with `_dta` first, then by variable
 position, then by `char`.
 
-Long survey item text usually lives in a characteristic. Stata stores at
+Survey files usually store long item text in a characteristic. Stata stores at
 most 67,783 bytes per characteristic. Longer text stays complete in this
 table; `setup.do` truncates it and warns.
 
