@@ -649,7 +649,8 @@ def write_readme(root, stems, info):
     if info["changes"]:
         out += "| Changes in this version | %s |\n" % mdcell(info["changes"])
     if info["derived"]:
-        out += "| Derived from | %s |\n" % mdcell(info["derived"])
+        dp = (info["derived"].split("|") + ["", "", ""])[:3]
+        out += "| Derived from | version %s in %s (MANIFEST.json sha256 %s) |\n" % (mdcell(dp[1]), mdcell(dp[0]), dp[2][:12])
     out += "\n## Datasets\n\n| Dataset | Label | Observations | Variables |\n|---|---|---|---|\n"
     for ds in stems:
         dd = dict(read_csv(meta_path(root, ds, "dataset"))[1:])

@@ -2356,7 +2356,7 @@ void _ddp_datapackage()
 void _ddp_readme()
 {
     string scalar root, out, nl, ds, tit, dlab, fmts, prof, t, pkg, fe
-    string rowvector stems, files
+    string rowvector stems, files, dparts
     string matrix D
     string colvector dk, dv
     real scalar d, i, sz
@@ -2381,7 +2381,12 @@ void _ddp_readme()
     out = out + "| Profile | " + prof + " |" + nl
     if (st_local("license") != "") out = out + "| License | " + _ddp_mdcell(st_local("license")) + " |" + nl
     if (st_local("changes") != "") out = out + "| Changes in this version | " + _ddp_mdcell(st_local("changes")) + " |" + nl
-    if (st_local("derived") != "") out = out + "| Derived from | " + _ddp_mdcell(st_local("derived")) + " |" + nl
+    if (st_local("derived") != "") {
+        dparts = _ddp_split(st_local("derived"), "|")
+        while (cols(dparts) < 3) dparts = dparts, ""
+        out = out + "| Derived from | version " + _ddp_mdcell(dparts[2]) + " in " + _ddp_mdcell(dparts[1]) +
+              " (MANIFEST.json sha256 " + substr(dparts[3], 1, 12) + ") |" + nl
+    }
     out = out + nl + "## Datasets" + nl + nl
     out = out + "| Dataset | Label | Observations | Variables |" + nl + "|---|---|---|---|" + nl
     for (d = 1; d <= cols(stems); d++) {

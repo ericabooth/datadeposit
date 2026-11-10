@@ -1,6 +1,6 @@
 # Parity fixture nlsw88
 
-This folder is an archive-ready data deposit. It holds the data, a codebook, and setup scripts that rebuild the labelled data in Stata, R, and Python from the plain-text csv. It was written by datadeposit 0.1.0 in Stata 19.5 on 2026-11-09T16:50:25.
+This folder is an archive-ready data deposit. It holds the data, a codebook, and setup scripts that rebuild the labelled data in Stata, R, and Python from the plain-text csv. It was written by datadeposit 0.1.0 in Stata 19.5 on 2026-11-09T21:22:44.
 
 | Item | Value |
 |---|---|

@@ -549,7 +549,11 @@ dd_write_readme <- function(root, stems, info) {
   out <- paste0(out, "| Version | ", dd_mdcell(info$version), " |\n| Profile | ", info$profile, " |\n")
   if (nzchar(info$license)) out <- paste0(out, "| License | ", dd_mdcell(info$license), " |\n")
   if (nzchar(info$changes)) out <- paste0(out, "| Changes in this version | ", dd_mdcell(info$changes), " |\n")
-  if (nzchar(info$derived)) out <- paste0(out, "| Derived from | ", dd_mdcell(info$derived), " |\n")
+  if (nzchar(info$derived)) {
+    dp <- c(strsplit(info$derived, "|", fixed = TRUE)[[1]], "", "", "")[1:3]
+    out <- paste0(out, "| Derived from | version ", dd_mdcell(dp[2]), " in ", dd_mdcell(dp[1]),
+                  " (MANIFEST.json sha256 ", substr(dp[3], 1, 12), ") |\n")
+  }
   out <- paste0(out, "\n## Datasets\n\n| Dataset | Label | Observations | Variables |\n|---|---|---|---|\n")
   for (ds in stems) {
     dd <- dd_kv(root, ds)
