@@ -1,0 +1,58 @@
+name: tests
+
+# To turn this on, copy this file to .github/workflows/tests.yml and push it from
+# GitHub Desktop or the GitHub website (a command-line token needs the workflow scope).
+
+# Stata cannot run on GitHub's machines (it needs a license), so Stata's own
+# battery runs locally (tools/run_all_tests.sh). Here R and Python rebuild the
+# golden deposits that Stata wrote (tests/golden) and must match them under
+# the parity contract in spec/DEPOSIT-SPEC.md.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Templates, versions, and fixtures in sync
+        run: python tools/sync_templates.py --check
+
+  test:
+    needs: sync
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: r
+          extra-packages: any::rcmdcheck, any::haven, any::writexl, any::readxl, any::testthat
+      - name: Install the Python package
+        run: python -m pip install "./python[test]"
+      - name: Python tests
+        run: python -m pytest -q python/tests
+      - name: R CMD check
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          working-directory: r
+          args: 'c("--no-manual")'
+          error-on: '"error"'
+      - name: Install the R package
+        run: R CMD INSTALL r
+      - name: Python matches the Stata golden deposits
+        run: python tests/parity/parity.py
+      - name: R matches the Stata golden deposits
+        run: Rscript tests/parity/parity.R python

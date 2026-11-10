@@ -353,10 +353,10 @@ the rest.
   the Stata ado-file, and its `--check` mode fails when any copy differs. The same tool
   writes the version number from `VERSION` into every package.
 - **Reference deposits.** Stata writes deposits of the test files into `tests/golden/`.
-  On every push, GitHub Actions rebuilds them in R and Python on Linux, macOS, and Windows
-  and compares them file by file. Stata cannot run on GitHub's machines, so
-  `tools/run_all_tests.sh` runs the Stata tests locally on Stata 16 and on the current
-  release.
+  `tools/run_all_tests.sh` rebuilds them in R and Python and compares them file by file,
+  after running the Stata tests on Stata 16 and on the current release. A GitHub Actions
+  workflow that repeats the R and Python checks on Linux, macOS, and Windows is in
+  `tools/ci/tests.yml`, ready to copy into `.github/workflows/`; it has not been run yet.
 - **A torture suite.** `tests/torture/` feeds 29 awkward inputs to all three languages:
   mislabeled files, odd encodings, ragged rows, binary data named `.txt`, and a folder
   path with an apostrophe and accents. The three must make the same decision about each
