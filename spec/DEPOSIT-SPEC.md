@@ -44,6 +44,12 @@ them at run time, so the scripts are identical for every dataset except for
 the dataset stem on one line. The JSON, XML, Markdown, and Excel files are
 views of the same tables.
 
+When the user names no folder, a writer puts the deposit in the working
+directory as `<ds>_deposit`. It does not write beside the source file. A
+new version of a deposit that was loaded with `use` goes beside its parent
+as `<ds>_deposit_v<n>` when the parent's folder still exists, and in the
+working directory otherwise.
+
 ## 2. Profiles and the size check
 
 | profile | data files written |

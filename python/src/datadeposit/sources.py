@@ -149,6 +149,7 @@ def missing_codes(series):
     return pd.Series(["." + chr(96 + int(v)) if v else "" for v in k], index=series.index, name=series.name)
 
 
+NUMBER = re.compile(r"^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$")
 STATA_MAX = 8.988465674311579e307
 MISSING_TOKENS = {"", "NA", "N/A", "NaN", "nan", "null", "NULL", "."}
 
@@ -516,7 +517,9 @@ def typed_columns(df, decimal=".", base="", notes=None):
             out[c] = s
             continue
         u = t.str.replace(",", ".", regex=False) if decimal == "," else t
-        num = pd.to_numeric(u.where(nonempty, None), errors="coerce")
+        # Python's float() is exact; pandas before version 3 is not when it converts text
+        num = pd.Series([float(x) if (ok and NUMBER.match(x)) else np.nan
+                         for x, ok in zip(u.tolist(), nonempty.tolist())], index=u.index, dtype="float64")
         num = num.where(np.isfinite(num.to_numpy(dtype=float, na_value=np.nan)))
         allnum = bool(num[nonempty].notna().all())
         lead0 = bool(t[nonempty].str.match(r"^-?0[0-9]").any())

@@ -1,6 +1,6 @@
 # Parity fixture auto
 
-This folder is an archive-ready data deposit. It holds the data, a codebook, and setup scripts that rebuild the labelled data in Stata, R, and Python from the plain-text csv. It was written by datadeposit 0.1.0 in Stata 19.5 on 2026-11-09T21:22:43.
+This folder is an archive-ready data deposit. It holds the data, a codebook, and setup scripts that rebuild the labelled data in Stata, R, and Python from the plain-text csv. It was written by datadeposit 0.1.1 in Stata 19.5 on 2026-11-12T07:02:39.
 
 | Item | Value |
 |---|---|
@@ -63,8 +63,8 @@ df.attrs["column_names_to_labels"]   # variable labels
 | metadata/auto_valuelabels.csv | 69 | every value label |
 | metadata/auto_variables.csv | 966 | one row per variable: type, format, label, value label set |
 | setup/auto_setup.R | 13,458 | rebuilds the data in R |
-| setup/auto_setup.do | 8,665 | rebuilds the data in Stata |
-| setup/auto_setup.py | 9,432 | rebuilds the data in Python |
+| setup/auto_setup.do | 9,621 | rebuilds the data in Stata |
+| setup/auto_setup.py | 9,744 | rebuilds the data in Python |
 | MANIFEST.json | | sizes and sha256 hashes of every file |
 
 ## Checking and changing this deposit

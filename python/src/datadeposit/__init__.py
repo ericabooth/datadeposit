@@ -14,7 +14,7 @@ from .api import (DepositError, datadeposit, deposit_apply, deposit_codebook, de
                   find_rscript)
 from .sources import missing_codes
 
-PACKAGE_VERSION = "0.1.0"
+PACKAGE_VERSION = "0.1.1"
 __version__ = PACKAGE_VERSION
 deposit = datadeposit
 

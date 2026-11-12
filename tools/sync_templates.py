@@ -90,7 +90,7 @@ def targets():
     for p in [ROOT / "python" / "src" / "datadeposit" / "__init__.py", ROOT / "r" / "R" / "util.R"]:
         if p.exists():
             files[p] = re.sub(r'(PACKAGE_VERSION\s*(?:=|<-)\s*")[^"]*(")', r"\g<1>%s\g<2>" % v, p.read_text())
-    pkg = ROOT / "stata" / "datadeposit.pkg"
+    pkg = ROOT / "datadeposit.pkg"
     if pkg.exists():
         files[pkg] = re.sub(r"^d Version: .*$", "d Version: " + v, pkg.read_text(), flags=re.M)
     return files

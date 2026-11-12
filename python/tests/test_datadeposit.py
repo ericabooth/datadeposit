@@ -227,3 +227,39 @@ def test_wide_file_is_fast(tmp_path):
     t = time.time()
     _ = [d[c].sum() for c in d.columns[:300]]
     assert time.time() - t < 5      # metadata is shared, not copied, on each column access
+
+
+def test_default_folder_is_the_working_directory(tmp_path, monkeypatch):
+    import shutil
+    src = tmp_path / "02_cleaned"
+    src.mkdir()
+    shutil.copy(str(FIX / "auto.dta"), str(src / "mini.dta"))
+    work = tmp_path / "work"
+    work.mkdir()
+    monkeypatch.chdir(work)
+    r = datadeposit(str(src / "mini.dta"), quiet=True)
+    assert os.path.samefile(os.path.dirname(r["path"]), str(work))
+    assert not (src / "mini_deposit").exists()
+    d = deposit_use(r["path"])
+    r2 = datadeposit(d, quiet=True)
+    assert r2["path"].endswith("mini_deposit_v2") and os.path.samefile(os.path.dirname(r2["path"]), str(work))
+
+
+def test_text_to_number_is_exact_on_every_pandas(tmp_path):
+    # columns with extended missing codes are read as text, then converted;
+    # pandas before version 3 converted text with a parser that could miss the last digit
+    rng = np.random.default_rng(7)
+    vals = rng.uniform(-1, 1, 5000) * 10.0 ** rng.integers(-12, 15, 5000)
+    from datadeposit import core, sources as src
+    col = core.Column("x", "x", "double", "%10.0g", "", "", vals.copy(),
+                      np.where(np.arange(5000) < 20, 1, 0).astype(np.int8))
+    col.values[:20] = np.nan
+    t = core.Table("exact", [col], 5000)
+    from datadeposit import api
+    back = api.to_frame(t)
+    got = back["x"].to_numpy(dtype=float)
+    assert np.array_equal(got[20:], vals[20:])
+    p = tmp_path / "t.csv"
+    p.write_text("x,flag\n" + "\n".join("%.17g,a" % v for v in vals) + "\n")
+    t2 = src.read_any(str(p))
+    assert np.array_equal(np.asarray(t2.columns[0].values, float), vals)

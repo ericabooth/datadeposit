@@ -193,6 +193,11 @@ datadeposit, to("share/survey_deposit") title("Resident survey, cleaned") ///
     authors("Eric A. Booth; Jane Analyst") license("CC-BY-4.0") onlarge(lean) replace
 ```
 
+Give `to()` in a project script. Without it, the deposit goes to `<name>_deposit` in the
+working directory, and the receipt prints the full path. The command does not write
+beside the source file, because that folder is often a raw or cleaned data folder that
+other scripts read.
+
 `replace` removes the earlier deposit's files before writing, so a rerun does not leave
 a stale copy beside a new one. It refuses to touch a folder that is not a deposit.
 `onlarge(lean)` keeps the line working as the data grow, as the section on large files

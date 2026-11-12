@@ -30,6 +30,9 @@ end
 use "`fx'/survey_edge.dta", clear
 datadeposit, to(sv) title("Battery survey") authors("Eric A. Booth") license("CC-BY-4.0")
 check `"r(verified) == "passed""' "survey deposit round trip passed"
+check "strlen(r(manifest_sha256)) == 64" "sha256 hashes are written (also under version 16)"
+local man = fileread("sv/MANIFEST.json")
+check `"ustrregexm(`"`man'"', "codebook.md., .bytes.: [0-9]+, .sha256.: .[0-9a-f]{64}")"' "MANIFEST.json lists a hash for each file"
 check `"r(profile) == "full""' "default profile is full"
 foreach f in README.md MANIFEST.json datapackage.json data/survey_edge.csv data/survey_edge.dta ///
     data/survey_edge.rds metadata/survey_edge_variables.csv metadata/survey_edge_valuelabels.csv ///
@@ -238,6 +241,44 @@ capture datadeposit, files("xl/data/auto.xlsx") to(fromxl) replace
 check "_rc == 0" "an Excel file deposits"
 capture datadeposit, files("sv/codebook/survey_edge_codebook.md") to(frommd) replace
 check "_rc == 610" "a Markdown file is refused as data"
+
+* --- 10. fixes from review (0.1.1) ------------------------------------------------------------
+* the default deposit goes to the working directory, not into the source's folder
+capture mkdir "02_cleaned"
+sysuse auto, clear
+save "02_cleaned/mini.dta", replace
+use "02_cleaned/mini.dta", clear
+datadeposit
+capture confirm file "mini_deposit/MANIFEST.json"
+check "_rc == 0" "default deposit is in the working directory"
+mata: st_local("inside", strofreal(direxists("02_cleaned/mini_deposit")))
+check "`inside' == 0" "default deposit is not inside the source data folder"
+* the source folder has been deleted since the data were loaded
+mkdir gone_dir
+save "gone_dir/mini2.dta", replace
+use "gone_dir/mini2.dta", clear
+erase "gone_dir/mini2.dta"
+rmdir gone_dir
+datadeposit
+mata: st_local("back", strofreal(direxists("gone_dir")))
+check "`back' == 0" "a deleted source folder is not recreated"
+capture confirm file "mini2_deposit/MANIFEST.json"
+check "_rc == 0" "deposit of data from a deleted folder is in the working directory"
+* a new version still goes beside its parent
+datadeposit use mini_deposit, clear
+datadeposit
+check `"strpos(r(path), "mini_deposit_v2") > 0"' "version 2 goes beside its parent"
+* more than 2,500 columns: setup.do must rebuild the file
+clear
+set obs 20
+forvalues j = 1/2600 {
+    gen byte q`j' = mod(_n + `j', 5)
+}
+gen str3 s = "abc"
+gen double x = _n / 7
+replace x = .b in 3
+datadeposit, to(wide2600) replace nostats
+check `"r(verified) == "passed""' "2,602-column file rebuilds from the csv with setup.do"
 
 cd "`here'"
 di as txt "{hline}"

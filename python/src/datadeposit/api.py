@@ -262,7 +262,7 @@ def datadeposit(data=None, to=None, *, name=None, files=None, folder=None, patte
 
     data       a DataFrame, a dict of name -> DataFrame, a path, or a list of paths
                (.dta read with full metadata; .sav, .csv, .xlsx, .parquet through pandas)
-    to         the deposit folder (default <name>_deposit next to the source)
+    to         the deposit folder (default <name>_deposit in the working directory)
     formats    data files to write, from csv dta rds xlsx sav (default csv dta rds)
     lean       keep the native file plus the csv; setup scripts cover the rest
     nodata     metadata, codebook, and setup scripts only
@@ -338,11 +338,15 @@ def datadeposit(data=None, to=None, *, name=None, files=None, folder=None, patte
     if to is None:
         if len(items) > 1:
             raise DepositError("several datasets: say where the deposit goes with to=")
-        base = items[0][1] if isinstance(items[0][1], str) else ""
-        if prov:
-            base = prov.split("|")[0]
+        # Without to=, the deposit goes to the working directory, not beside
+        # the source file (that folder may be a data folder other code reads).
+        # A new version of a loaded deposit goes beside its parent when the
+        # parent's folder is still there.
+        where = ""
+        if prov and os.path.isdir(prov.split("|")[0]):
+            where = os.path.dirname(prov.split("|")[0])
         suffix = "_deposit" if version == "1" else "_deposit_v" + version
-        to = os.path.join(os.path.dirname(base), stems[0] + suffix)
+        to = os.path.join(where, stems[0] + suffix)
 
     # ---- profile
     if formats is not None:

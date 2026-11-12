@@ -77,8 +77,19 @@ frame `FV' {
 * ---- read the data ----------------------------------------------------------
 local dopts varnames(1) case(preserve) encoding("utf-8") bindquotes(strict) ///
     maxquotedrows(unlimited) delimiters(",") asdouble clear
-if "`numcols'" != "" local dopts `dopts' numericcols(`numcols')
-if "`strcols'" != "" local dopts `dopts' stringcols(`strcols')
+* Stata accepts at most 2,500 column numbers in numericcols(), so a wider
+* file is read as text and converted below with real(), which is exact
+if `K' > c(maxvar) {
+    di as err "setup: `ds' has `K' variables, more than this Stata session allows (`c(maxvar)')."
+    di as err "  Type  set maxvar `=`K' + 100'  and run this file again (Stata BE stops at 2,048)."
+    set varabbrev `vab'
+    exit 900
+}
+if `K' <= 2000 {
+    if "`numcols'" != "" local dopts `dopts' numericcols(`numcols')
+    if "`strcols'" != "" local dopts `dopts' stringcols(`strcols')
+}
+else local dopts `dopts' stringcols(_all)
 quietly import delimited using `"`root'/data/`ds'.csv"', `dopts'
 
 if c(k) != `K' {
@@ -133,6 +144,21 @@ forvalues j = 1/`K' {
         }
         drop `v'
         rename `t' `v'
+    }
+    if "`kind'" == "numeric" {
+        capture confirm string variable `v'
+        if !_rc {
+            tempvar t
+            quietly gen double `t' = real(`v')
+            quietly count if missing(`t') & `v' != "" & !regexm(`v', "^\.[a-z]?$")
+            if r(N) {
+                di as err "setup: `v' has `r(N)' values that are not numbers"
+                set varabbrev `vab'
+                exit 459
+            }
+            drop `v'
+            rename `t' `v'
+        }
     }
     if "`kind'" == "string" {
         * import delimited turns \r\n inside quoted text into \r; restore it

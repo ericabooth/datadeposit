@@ -9,7 +9,7 @@
 #'
 #' @param data a data frame, a named list of data frames, or file paths
 #'   (\code{.dta} files are read with every label, note, and characteristic).
-#' @param to the deposit folder; defaults to \code{<name>_deposit} beside the source.
+#' @param to the deposit folder; defaults to \code{<name>_deposit} in the working directory.
 #' @param name dataset name (the file stem used inside the deposit).
 #' @param files,folder,pattern deposit several files, or every file in a folder.
 #' @param formats data files to write, from \code{csv dta rds xlsx sav}; default
@@ -102,8 +102,14 @@ datadeposit <- function(data = NULL, to = NULL, name = NULL, files = NULL, folde
   stems <- vapply(items, `[[`, "", "stem")
   if (is.null(to)) {
     if (length(items) > 1) stop("several datasets: say where the deposit goes with to =", call. = FALSE)
-    base <- if (is.character(items[[1]]$src)) dirname(items[[1]]$src) else "."
-    if (nzchar(prov)) base <- dirname(strsplit(prov, "|", fixed = TRUE)[[1]][1])
+    # Without to, the deposit goes to the working directory, not beside the
+    # source file (that folder may be a data folder other code reads). A new
+    # version of a loaded deposit goes beside its parent when the parent's
+    # folder is still there.
+    base <- "."
+    if (nzchar(prov) && dir.exists(strsplit(prov, "|", fixed = TRUE)[[1]][1])) {
+      base <- dirname(strsplit(prov, "|", fixed = TRUE)[[1]][1])
+    }
     to <- file.path(base, paste0(stems[1], if (version == "1") "_deposit" else paste0("_deposit_v", version)))
   }
 

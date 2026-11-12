@@ -1,7 +1,7 @@
 Package: datadeposit
 Type: Package
 Title: Archive-Ready Data Deposits for Stata, R, Python, and Excel
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Eric A.", "Booth", email = "eric.a.booth@gmail.com", role = c("aut", "cre"))
 Description: Writes a deposit folder in the style of data archives such as ICPSR
     and Harvard Dataverse: the data as csv plus Stata, R, and optional Excel and

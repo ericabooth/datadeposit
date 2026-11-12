@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.0  09nov2026}{...}
+{* *! version 0.1.1  12nov2026}{...}
 {vieweralsosee "datadictionary (if installed)" "help datadictionary"}{...}
 {vieweralsosee "[D] notes" "help notes"}{...}
 {vieweralsosee "[D] label language" "help label_language"}{...}
@@ -56,7 +56,7 @@
 {synopthdr}
 {synoptline}
 {syntab:Where and what}
-{synopt:{opt to(folder)}}deposit folder; default is {it:name}{cmd:_deposit} beside the source file{p_end}
+{synopt:{opt to(folder)}}deposit folder; default is {it:name}{cmd:_deposit} in the working directory{p_end}
 {synopt:{opt files(filelist)}}deposit these files in place of the data in memory{p_end}
 {synopt:{opt folder(path)}}deposit every data file in this folder{p_end}
 {synopt:{opt pattern(pattern)}}which files in {cmd:folder()} to consider; default {cmd:*.dta}{p_end}
@@ -130,9 +130,13 @@ team can open, and each rerun of the do-file refreshes it.
 
 {phang}
 {opt to(folder)} names the deposit folder. Without it, the folder is
-{it:name}{cmd:_deposit} beside the source file, or {it:name}{cmd:_deposit_v}{it:#}
-for version {it:#}. Data that came with Stata ({cmd:sysuse}, {cmd:webuse}) are
-deposited in the working directory.
+{it:name}{cmd:_deposit} in the working directory ({cmd:pwd} shows it), and the
+receipt prints its full path. The deposit is not written beside the source file,
+because that folder is often a raw or cleaned data folder that other do-files
+read. The one exception is a new version of a deposit you loaded with
+{cmd:datadeposit use}: it goes beside its parent as {it:name}{cmd:_deposit_v}{it:#}.
+We suggest you give {cmd:to()} in a project do-file, so the location does not
+depend on the working directory.
 {p_end}
 
 {phang}

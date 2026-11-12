@@ -30,6 +30,7 @@ except ImportError:  # pragma: no cover - depends on the machine
 DATASET = "survey_edge"
 SPEC = "1.0"
 _TAG = re.compile(r"^\.[a-z]$")
+_NUMBER = re.compile(r"^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$")
 _TAGGED_NAN = 0x7FF8000000000000   # a quiet NaN; the low byte holds 1 (.a) to 26 (.z)
 
 
@@ -150,11 +151,14 @@ def load(root=None, categoricals=False):
                 meta["extended_missing"][name] = ext
             s = s.where(~tags, "")
             if kind == "numeric":
-                num = pd.to_numeric(s.where(s != "", None), errors="coerce")
-                bad = num.isna() & (s != "")
-                if bad.any():
-                    raise ValueError("setup: %s has non-numeric values, first: %r" % (name, s[bad].iloc[0]))
-                df[name] = num.astype("float64")
+                # Python's own float() is exact for every input; pandas before
+                # version 3 can miss the last binary digit when it converts text
+                vals = s.tolist()
+                bad = [x for x in vals if x != "" and not _NUMBER.match(x)]
+                if bad:
+                    raise ValueError("setup: %s has non-numeric values, first: %r" % (name, bad[0]))
+                df[name] = pd.Series([float(x) if x != "" else float("nan") for x in vals],
+                                     index=df.index, dtype="float64")
             elif kind == "date":
                 df[name] = pd.to_datetime(s.where(s != "", None), format="%Y-%m-%d", errors="raise")
             elif kind == "datetime":

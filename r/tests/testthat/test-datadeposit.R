@@ -178,3 +178,18 @@ test_that("a wide file stays fast", {
   expect_equal(r$verified, "passed")
   expect_lt(as.numeric(difftime(Sys.time(), t0, units = "secs")), 120)
 })
+
+test_that("the default folder is the working directory, not the source folder", {
+  base <- file.path(tempdir(), "r_default")
+  unlink(base, recursive = TRUE)
+  dir.create(file.path(base, "02_cleaned"), recursive = TRUE)
+  dir.create(file.path(base, "work"))
+  file.copy(fixture("auto.dta"), file.path(base, "02_cleaned", "mini.dta"))
+  old <- setwd(file.path(base, "work"))
+  on.exit(setwd(old))
+  r <- dep(file.path(base, "02_cleaned", "mini.dta"))
+  expect_equal(normalizePath(dirname(r$path)), normalizePath(file.path(base, "work")))
+  expect_false(dir.exists(file.path(base, "02_cleaned", "mini_deposit")))
+  r2 <- dep(deposit_use(r$path))
+  expect_match(r2$path, "mini_deposit_v2$")
+})

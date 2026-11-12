@@ -21,7 +21,7 @@ d
 d Author: Eric A. Booth
 d Support: email eric.a.booth@gmail.com
 d
-d Version: 0.1.0
-d Distribution-Date: 20261109
+d Version: 0.1.1
+d Distribution-Date: 20261112
 f stata/src/datadeposit.ado
 f stata/src/datadeposit.sthlp
